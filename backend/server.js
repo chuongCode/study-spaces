@@ -72,6 +72,12 @@ httpServer.listen(srvConfig.SERVER_PORT, () => {
 const io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
     console.log(`New connection: ${socket.id}`);
+    
+    // given a room ID, make a connection to the room
+    socket.on('join-room', (roomId) => {
+        console.log(`Connection joined room ${roomId}`);
+        socket.join(roomId);
+    });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
 });
