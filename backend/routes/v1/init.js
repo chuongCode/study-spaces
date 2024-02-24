@@ -34,6 +34,13 @@ init.get('/getGroups', async function (req, res, next) {
     console.log(groups);
 });
 
+init.post('/createGroup', async function (req, res, next) {
+    const { name } = req.body;
+    const group = await Group.create({ name, status: 'inactive' });
+    res.json(group);
+    console.log(group);
+});
+
 init.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
     try {
         // Check if a file was uploaded
