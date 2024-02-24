@@ -10,5 +10,11 @@ init.get("/", async function (req, res, next) {
 });
 
 
+init.get("/test", async function (req, res, next) {
+    res.json({
+        'version': 1.0,
+        'name': 'Express.js & Socket.io API boilerplate'
+    });
+});
 
 module.exports = init
