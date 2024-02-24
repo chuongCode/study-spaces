@@ -16,6 +16,10 @@ const mammoth = require('mammoth');
 const pdf = require('html-pdf');
 const upload = multer({ storage });
 const PDFParser = require('pdf-parse');
+const Sequelize = require('sequelize');
+const db = require('../../models');
+const { group } = require('console');
+const Group = db.Group;
 
 init.get('/', async function (req, res, next) {
     res.json({
@@ -24,11 +28,12 @@ init.get('/', async function (req, res, next) {
     });
 });
 
-init.get('/test', async function (req, res, next) {
-    res.json({
-        version: 1.0,
-        name: 'Express.js & Socket.io API boilerplate',
-    });
+init.get('/getGroups', async function (req, res, next) {
+
+    const groups = await Group.findAll();
+    res.json(groups);
+
+    console.log(groups);
 });
 
 init.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
@@ -117,4 +122,15 @@ async function convertToPDF(filePath) {
             });
     });
 }
+
+
+
+
+// get all group endpoint
+const getAllGroups = Sequelize.define('getAll', {
+    
+});
+
+
+
 module.exports = init;

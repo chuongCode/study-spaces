@@ -74,7 +74,7 @@ const io = require('socket.io')(httpServer, {
         path: '/socket',
     },
 });
-console.log('rerender');
+
 io.on('connection', function (socket) {
     console.log(`Connection join (${socket.id})`);
     socket.on('connection', () => {
@@ -86,6 +86,17 @@ io.on('connection', function (socket) {
         console.log(`Connection joined room ${roomId}`);
         // socket.join(roomId);
         socket.emit('test');
+    });
+
+    socket.on('startGame', async () => {
+
+        // await startGameInDatabase();
+
+        // await setGameToActive();
+
+        // const game = await getMultipleChoiceQuestions();
+
+        // socket.emit('initialGameData', game);
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
