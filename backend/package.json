@@ -26,7 +26,8 @@
     "passport-local": "latest",
     "pdf-parse": "^1.1.1",
     "sequelize": "^6.37.1",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
     "express-swagger-generator": "^1.1.17"
