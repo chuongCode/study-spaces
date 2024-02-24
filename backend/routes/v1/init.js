@@ -29,10 +29,8 @@ init.get('/', async function (req, res, next) {
 });
 
 init.get('/getGroups', async function (req, res, next) {
-
     const groups = await Group.findAll();
     res.json(groups);
-
     console.log(groups);
 });
 
@@ -122,15 +120,5 @@ async function convertToPDF(filePath) {
             });
     });
 }
-
-
-
-
-// get all group endpoint
-const getAllGroups = Sequelize.define('getAll', {
-    
-});
-
-
 
 module.exports = init;
