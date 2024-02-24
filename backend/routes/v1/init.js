@@ -117,4 +117,35 @@ async function convertToPDF(filePath) {
             });
     });
 }
+
+// init.post('/ai-request', async (req, res) => {
+//     try {
+//       // Replace 'YOUR_API_TOKEN' with your actual API token obtained from Cloudflare
+//       const API_TOKEN = 'ef148a4bb02971c9efab7b2296257a92d2418';
+  
+//       const response = await fetch('https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/@cf/meta/llama-2-7b-chat-int8', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': `Bearer ${API_TOKEN}` // Include the API token in the Authorization header
+//         },
+//         body: JSON.stringify({
+//           prompt: "How to win a hackathon?"
+//         })
+//       });
+  
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch AI response');
+//       }
+  
+//       const responseData = await response.json();
+//       console.log('AI response:', responseData);
+//       res.json(responseData);
+//     } catch (error) {
+//       console.error('Error calling AI worker:', error);
+//       res.status(500).json({ error: 'Internal Server Error' });
+//     }
+//   });
+  
+
 module.exports = init;
