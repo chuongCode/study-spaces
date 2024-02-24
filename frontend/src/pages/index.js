@@ -1,8 +1,6 @@
 import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import { UploadPDF } from '@/components/UploadPDF';
-import Image from "next/image";
-import { Inter } from "next/font/google";
 import JoinRoomButton from "./components/JoinRoomButton";
 
 const inter = Inter({ subsets: ['latin'] });
