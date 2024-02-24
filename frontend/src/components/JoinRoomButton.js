@@ -5,7 +5,8 @@ import { io } from "socket.io-client";
 let socket;
 
 const JoinRoomButton = ({ room }) => {
-    const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState(null);
+  
   useEffect(() => {
     const socket = io("http://localhost:3005"); // replace with your server URL
     setSocket(socket);
