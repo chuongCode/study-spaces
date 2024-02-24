@@ -8,7 +8,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const expressSwagger = require('express-swagger-generator')(app);
 const srvConfig = require('./config');
-const mongoose = require('mongoose');
 const {CONNECTION_TYPE, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT, DB_NAME, DB_QUERY_PARAMS} = srvConfig;
 const dbAuthString = (DB_USERNAME && DB_PASSWORD) ? `${srvConfig.DB_USERNAME}:${srvConfig.DB_PASSWORD}@` : '';
 let httpServer;
@@ -64,12 +63,7 @@ if (srvConfig.HTTPS_ENABLED) {
  * Start http server & connect to MongoDB
  */
 httpServer.listen(srvConfig.SERVER_PORT, () => {
-    mongoose.connect(`${CONNECTION_TYPE}://${dbAuthString}${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_QUERY_PARAMS}`, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }, () => {
-        console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
-    });
+    console.log(`Server started on port ${srvConfig.SERVER_PORT}`);
 });
 
 /**

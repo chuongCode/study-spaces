@@ -65,7 +65,7 @@ For more info you can read the official Socket.io documentation:
  * @returns {ResponseJSON.model} 200
  * @produces application/json
  */
-router.get('/dashboard', authenticationMiddleware(), (req, res) => {
+router.get('/dashboard', (req, res) => {
     return res.json({
         username: req.session.passport.user.username,
         message: 'This is a authenticated route!'
