@@ -1,0 +1,36 @@
+{
+    "development": {
+        "username": "doadmin",
+        "password": "AVNS_3p2JieyoIA43PaD2zdF",
+        "database": "defaultdb",
+        "host": "db-mysql-nyc3-21266-do-user-15907541-0.c.db.ondigitalocean.com",
+        "dialect": "mysql",
+        "port": "25060",
+        "sslmode": "REQUIRED",
+        "dialectOptions": {
+            "ssl": {
+                "require": true,
+                "rejectUnauthorized": false,
+                "ca": "./ca-certificate.crt"
+            }
+        }
+    },
+    "test": {
+        "username": "doadmin",
+        "password": "AVNS_3p2JieyoIA43PaD2zdF",
+        "database": "defaultdb",
+        "host": "db-mysql-nyc3-21266-do-user-15907541-0.c.db.ondigitalocean.com",
+        "dialect": "mysql",
+        "port": "25060",
+        "sslmode": "REQUIRED"
+    },
+    "production": {
+        "username": "doadmin",
+        "password": "AVNS_3p2JieyoIA43PaD2zdF",
+        "database": "defaultdb",
+        "host": "db-mysql-nyc3-21266-do-user-15907541-0.c.db.ondigitalocean.com",
+        "dialect": "mysql",
+        "port": "25060",
+        "sslmode": "REQUIRED"
+    }
+}
