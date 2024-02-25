@@ -21,7 +21,8 @@ export const Login = ({ setIsSubmit }) => {
                     opacity: [0, 100],
                     y: [10, 0],
                 }}>
-                <Header>Login</Header>
+                <Header>Study Spaces</Header>
+                <p className='font-extralight uppercase text-xl w-full text-center relative top-[-30px]'>Login</p>
                 <input
                     type='text'
                     placeholder='Username'
