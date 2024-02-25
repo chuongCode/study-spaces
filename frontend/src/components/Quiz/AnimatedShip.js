@@ -11,12 +11,14 @@ export const AnimatedShip = ({ isPlayer, name, score, currentPlayerQuestionIndex
     useEffect(() => {
         const animateShip = async () => {
             await animate(scope.current, { x: currentPlayerQuestionIndex * 200 });
-            await animate2(scope2.current, { opacity: [0, 100] }, { duration: 0.1 });
-            await animate2(scope2.current, { opacity: [100, 0] }, { duration: 0.1 });
         };
         const animateFire = async () => {
-            await animate2(scope2.current, { opacity: [0, 100] }, { duration: 0.3 });
-            await animate2(scope2.current, { opacity: [100, 75, 50, 25, 0] }, { duration: 1 });
+            if (scope2.current) {
+                await animate2(scope2.current, { opacity: [0, 100] }, { duration: 0.3 });
+                if (scope2.current) {
+                    await animate2(scope2.current, { opacity: [100, 75, 50, 25, 0] }, { duration: 1 });
+                }
+            }
         };
         animateFire();
         animateShip();

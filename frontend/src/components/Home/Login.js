@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { useUserName } from '@/zustand/store';
@@ -6,6 +6,12 @@ import { motion } from 'framer-motion';
 
 export const Login = ({ setIsSubmit }) => {
     const { setUsername, username } = useUserName();
+
+    useEffect(() => {
+        if (username?.length > 0) {
+            setIsSubmit(true);
+        }
+    }, []);
 
     const submit = e => {
         e.preventDefault();
