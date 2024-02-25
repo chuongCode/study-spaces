@@ -98,14 +98,89 @@ io.on('connection', function (socket) {
         playersInGame = playersInGame.filter(player => player !== playerName);
     });
 
-    socket.on('answer', async playerName => {
-        playersInGame = playersInGame.filter(player => player !== playerName);
+    socket.on('answer', async ({ name, isCorrect }) => {
+        console.log('answer', { name, isCorrect });
+        let isEnd = false;
+        playersInGame = playersInGame.map(player => {
+            if (player.displayName === name) {
+                // last
+                if (player.currentQuestionIndex + 1 === maxQuestion) {
+                    console.log('finished');
+                    isEnd = true;
+                }
+
+                return {
+                    ...player,
+                    point: isCorrect ? player.point + 1 : player.point,
+                    currentQuestionIndex: player.currentQuestionIndex + 1,
+                };
+            }
+            return player;
+        });
+        console.log('after players in game');
+
+        if (isEnd) {
+            console.log('game won');
+            socket.emit('gameWon', name);
+            return;
+        } else {
+            console.log('game update');
+            console.log(playersInGame);
+            socket.emit('gameUpdate', playersInGame);
+        }
     });
 
     socket.on('startGame', async groupId => {
         console.log('startGame');
         socket.emit('loadingGame');
-        const questionList = await callAIAboutContent(groupId);
+        //const questionList = await callAIAboutContent(groupId);
+
+        const mockQuestion = [
+            {
+                question: '1. What was the significant event that occurred in 1991?',
+                answers: [
+                    'The Soviet Union collapsed.',
+                    'The World Wide Web was invented.',
+                    'The Hubble Space Telescope was launched.',
+                    'The first text message was sent.',
+                ],
+            },
+            {
+                question: '2. What technological innovation began to proliferate in the early 2000s?',
+                answers: [
+                    'Mobile phones with internet capabilities became widely available.',
+                    'Social media platforms like Facebook and Twitter emerged.',
+                    'Cloud computing and storage services gained popularity.',
+                    'The use of artificial intelligence and machine learning in various industries began to increase.',
+                ],
+            },
+            {
+                question: '3. What civil rights movement started in 2010?',
+                answers: [
+                    "The LGBTQ+ rights movement began in 2010 with the repeal of Don't Ask, Don't Tell.",
+                    'The Black Lives Matter movement started in 2010 in response to the shooting of Trayvon Martin.',
+                    'The #MeToo movement against sexual harassment and assault began in 2010 with the hashtag #YesAllWomen.',
+                    'The Disability Rights movement gained momentum in 2010 with the passage of the Affordable Care Act.',
+                ],
+            },
+            {
+                question: '4. What global challenge remains a pressing issue today?',
+                answers: [
+                    'Climate change continues to impact ecosystems worldwide.',
+                    'Poverty and inequality persist in many regions.',
+                    'Access to quality education and healthcare remains a challenge.',
+                    'The COVID-19 pandemic continues to affect global economies and societies.',
+                ],
+            },
+            {
+                question: '5. What geopolitical tension has been ongoing in the 21st century?',
+                answers: [
+                    'Tensions between Russia and Ukraine have been a major concern.',
+                    'The Middle East conflict has been a persistent issue.',
+                    "North Korea's nuclear program has caused geopolitical concerns.",
+                ],
+            },
+        ];
 
         const createPlayerData = playersInGame.map((player, idx) => ({
             id: idx,
@@ -113,9 +188,10 @@ io.on('connection', function (socket) {
             point: 0,
             currentQuestionIndex: 0,
         }));
-        maxQuestion = questionList.length;
+        playersInGame = createPlayerData;
+        maxQuestion = mockQuestion.length;
 
-        socket.emit('initialGameData', { questions: questionList, createPlayerData });
+        socket.emit('initialGameData', { questions: mockQuestion, createPlayerData });
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
@@ -123,12 +199,8 @@ io.on('connection', function (socket) {
 
 const callAIAboutContent = async groupId => {
     try {
-        // get groupId from req
-        // get content from GroupContent where groupId = groupId
-        // create a promt from the content : "The content of the group is: " + content
-        // send the prompt to the AI
-        // send the response to the client
-        // create a GroupQuiz with the response and groupId (store the response in the database for future use)
+        // Given group Id, get all the group content
+        // stringify and send to prompt
 
         const paragraph1 = `Over the past five decades, spanning from 1974 to 2024, the world has undergone significant transformations. The period witnessed the end of the Cold War in the late 1980s, culminating with the dissolution of the Soviet Union in 1991. The 21st century saw the rise of globalization, accelerated by technological advancements, notably the widespread adoption of the internet since the 1990s. Major events such as the September 11 attacks in 2001 and the global financial crisis of 2008 reshaped geopolitics and economics. Technological innovations like the proliferation of smartphones, beginning with the launch of the iPhone in 2007, have revolutionized communication and daily life. Moreover, movements for civil rights and social justice, such as the Arab Spring starting in 2010 and the Black Lives Matter movement, have garnered global attention and sparked societal change. Challenges including climate change, economic inequality, and geopolitical tensions remain pressing issues as the world continues to navigate the complexities of the 21st century.`;
 

@@ -11,25 +11,32 @@ const testName = 'kayla';
 
 const GroupPage = () => {
     const [gameState, setGameState] = useState('lobby');
+    const [winner, setWinner] = useState(null);
     const [playersState, setPlayerState] = useState(null);
     const [quiz, setQuiz] = useState(null);
 
     useEffect(() => {
         socket.emit('joinGame', testName);
 
+        socket.on('gameWon', name => {
+            setWinner(name);
+        });
+
         socket.on('loadingGame', () => {
-            console.log('loading game');
             setGameState('loading');
+        });
+
+        socket.on('gameUpdate', data => {
+            console.log('game update');
+            setPlayerState(data);
         });
 
         socket.on('initialGameData', data => {
             setGameState('quiz');
             if (data) {
-                console.log('data from socket');
                 setPlayerState(data.createPlayerData);
                 setQuiz(data.questions);
             } else {
-                console.log('no data');
             }
         });
 
@@ -44,10 +51,13 @@ const GroupPage = () => {
 
     const isQuizReady = quiz?.length > 0 && playersState;
 
-    console.log('quiz from index.js');
-    console.log(quiz);
-    console.log('players');
-    console.log(playersState);
+    if (winner) {
+        return (
+            <div className='w-full h-screen flex flex-col justify-center items-center'>
+                <Header>{winner} won!</Header>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -58,7 +68,7 @@ const GroupPage = () => {
                 </div>
             )}
             {gameState === 'quiz' && isQuizReady && (
-                <Quiz playersState={playersState} quiz={quiz} playerName={testName} />
+                <Quiz playersState={playersState} quiz={quiz} playerName={testName} socket={socket} />
             )}
             <Button onClick={startGame}>Start Game</Button>
         </div>
