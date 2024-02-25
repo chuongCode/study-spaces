@@ -7,6 +7,7 @@ import { useUserName } from '@/zustand/store';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ProgressBar from '@ramonak/react-progress-bar';
+import { WinScreen } from '@/components/WinScreen';
 
 const GroupPage = () => {
     const [gameState, setGameState] = useState('lobby');
@@ -76,19 +77,11 @@ const GroupPage = () => {
     const isQuizReady = quiz?.length > 0 && playersState;
 
     if (tiers) {
-        return (
-            <div className='flex flex-col items-center justify-center w-full h-screen'>
-                <Header>{tiers} tied!</Header>
-            </div>
-        );
+        return <WinScreen>{tiers} tied!</WinScreen>;
     }
 
     if (winner) {
-        return (
-            <div className='flex flex-col items-center justify-center w-full h-screen'>
-                <Header>{winner} won!</Header>
-            </div>
-        );
+        return <WinScreen>{winner} won!</WinScreen>;
     }
 
     if (!winner && !tiers && gameState === 'end') {

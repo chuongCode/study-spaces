@@ -164,9 +164,9 @@ io.on('connection', function (socket) {
         console.log('START GAME!!!');
         io.sockets.emit('loadingGame', 0);
 
-        const questionList = await callAIAboutContent(groupId, count => {
-            io.sockets.emit('loadingGame', count);
-        });
+        // const questionList = await callAIAboutContent(groupId, count => {
+        //     io.sockets.emit('loadingGame', count);
+        // });
 
         const mockQuestion = [
             {
@@ -220,9 +220,9 @@ io.on('connection', function (socket) {
             },
         ];
 
-        maxQuestion = questionList.length;
+        maxQuestion = mockQuestion.length;
 
-        io.sockets.emit('initialGameData', { questions: questionList, createPlayerData: playersInGame });
+        io.sockets.emit('initialGameData', { questions: mockQuestion, createPlayerData: playersInGame });
     });
 
     socket.on('disconnect', () => {
