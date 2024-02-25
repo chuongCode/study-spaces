@@ -27,6 +27,7 @@
         "passport": "latest",
         "passport-local": "latest",
         "pdf-parse": "^1.1.1",
+        "react-router-dom": "^6.22.1",
         "sequelize": "^6.37.1",
         "sequelize-cli": "^6.6.2",
         "socket.io": "^4.7.4"
