@@ -5,7 +5,6 @@ import { useUserName } from '@/zustand/store';
 
 export const Home = () => {
     const [isSubmit, setIsSubmit] = useState(false);
-    const { username } = useUserName();
 
-    return <div>{isSubmit ? <Spaces /> : <Login setIsSubmit={setIsSubmit} />}</div>;
+    return <>{!isSubmit ? <Spaces /> : <Login setIsSubmit={setIsSubmit} />}</>;
 };

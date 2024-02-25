@@ -37,9 +37,9 @@ const Lobby = ({ startGame }) => {
                     {Array.from({ length: 3 })?.map((_, idx) => {
                         const player = playersState?.at(idx);
                         if (player) {
-                            return <PlayerCard playerName={player.displayName} key={idx} />;
+                            return <PlayerCard idx={idx} playerName={player.displayName} key={idx} />;
                         }
-                        return <PlayerCard key={idx} />;
+                        return <PlayerCard idx={idx} key={idx} />;
                     })}
                 </div>
                 <div className=' flex justify-center w-full px-20 py-5 uppercase'>
