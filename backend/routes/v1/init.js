@@ -16,7 +16,6 @@ const mammoth = require('mammoth');
 const pdf = require('html-pdf');
 const upload = multer({ storage });
 const PDFParser = require('pdf-parse');
-const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 dotenv.config();
 const Sequelize = require('sequelize');
@@ -171,127 +170,6 @@ async function convertToPDF(filePath) {
                 reject(error);
             });
     });
-}
-
-init.post('/ai-request', async (req, res) => {
-    try {
-        // get groupId from req
-        // get content from GroupContent where groupId = groupId
-        // create a promt from the content : "The content of the group is: " + content
-        // send the prompt to the AI
-        // send the response to the client
-        // create a GroupQuiz with the response and groupId (store the response in the database for future use)
-
-        const paragraph1 = `Within the spectrum of design roles, the Visual Designer (VisD) occupies a unique position, where aesthetic appeal converges with functional efficacy. Their primary objective is to imbue products with intuitive and appealing visual cues that enhance usability and desirability. Armed with a deep understanding of graphic design fundamentals, the VisD navigates the intricate interplay between form and function, striving for maximum coherence and impact. Their responsibilities extend beyond mere ornamentation, encompassing the articulation of visual design requirements and the development of a cohesive visual system. By proposing and refining visual strategies, the VisD ensures consensus among team members, aligning design decisions with broader project objectives. Furthermore, their keen eye for detail enables them to identify and rectify inconsistencies, thereby fostering a harmonious visual language that resonates with users on a profound level.`;
-
-        const content = paragraph1;
-
-        let questions = [];
-        for (let i = 0; i < 5; i++) {
-            const prompt = addContentToPrompt(
-                content,
-                questions.map(question => question.question)
-            );
-            console.log('prompt added!');
-            console.log(prompt);
-            const API_TOKEN = process.env.API_KEY;
-            const response = await fetch(
-                `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${API_TOKEN}`,
-                    },
-                    body: JSON.stringify({ prompt }),
-                }
-            );
-            if (!response.ok) {
-                throw new Error('Failed to fetch AI response');
-            }
-            const responseData = await response.json();
-            console.log(i);
-            console.log(responseData);
-
-            const [matches] = extractStrings(responseData.result.response);
-            console.log(matches);
-            if (!matches) {
-                console.log('input not given');
-            } else {
-                const question = parseQuestion(matches);
-                questions.push(question);
-            }
-            await sleep(300);
-        }
-        console.log('final questions');
-        console.log('questions');
-        res.json(questions);
-    } catch (error) {
-        console.error('Error calling AI worker:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function addContentToPrompt(content, questions) {
-    const prompt = `You are an intelligent agent that creates multiple choice questions based out of the topic of the contents that I give you.
-
-You are given a list of previous questions. Generate a unique question not listed in next to "Do not repeat these questions when generating the new question:". Also generate and 4 possible multiple choice answers that could answer the question. One of the answers should be the only correct answer. Lastly, from the answers you create say the letter of the correct answer. Give the unique generated question not mentioned next to "Do not repeat these questions when generating the new question" as <question>. On the next line list the four possible multiple choice answers from letters A to D respectively. On the last line, give the correct answer letter as 'Correct Option is: <letter>' ending with '@@'. You will also be given a list of previous questions you have written in the past. Do not repeat these questions come up with a unique question to ask the user.
-
-Create 5 questions based off of this prompt
-
-`;
-    return prompt;
-}
-
-function parseQuestion(input) {
-    // Split the input into lines
-    const lines = input.split('\n');
-
-    // Extract the question
-    const question = lines[0].trim().split(': ')[1];
-
-    // Extract the options
-    const options = [];
-    for (let i = 1; i <= 4; i++) {
-        options.push(lines[i].trim().substring(3));
-    }
-
-    // Extract the correct option index
-    let correctOptionIndex;
-    const correctOptionLine = lines.find(line => line.includes('Correct Option is:'));
-    if (correctOptionLine) {
-        const correctOptionLetter = correctOptionLine.trim().split(': ')[1].trim();
-        correctOptionIndex = correctOptionLetter.charCodeAt(0) - 'A'.charCodeAt(0);
-    }
-
-    // Return the parsed data
-    return {
-        question: question,
-        options: options,
-        correctOptionIndex: correctOptionIndex,
-    };
-}
-
-function extractStrings(input) {
-    var matches = [];
-    var startIndex = 0;
-    var endIndex = 0;
-
-    while (startIndex !== -1 && endIndex !== -1) {
-        startIndex = input.indexOf('@@', endIndex);
-        if (startIndex !== -1) {
-            endIndex = input.indexOf('@@', startIndex + 2);
-            if (endIndex !== -1) {
-                matches.push(input.substring(startIndex + 2, endIndex));
-            }
-        }
-    }
-
-    return matches;
 }
 
 module.exports = init;
