@@ -5,33 +5,16 @@ import { QuizQuestions } from './QuizQuestions';
 export const Quiz = ({ playersState, quiz, playerName, socket }) => {
     const playersStateSorted = playersState.sort((a, b) => a.id > b.id);
 
-    useEffect(() => {}, []);
-
     const currentPlayer = playersState.find(player => player.displayName === playerName);
-
-    const moveCurrentPlayer = () => {
-        setPlayersState(prev => {
-            return prev.map(player => {
-                if (player.displayName === currentPlayer.displayName) {
-                    return {
-                        ...player,
-                        currentQuestionIndex: player.currentQuestionIndex + 1,
-                    };
-                }
-                return player;
-            });
-        });
-    };
 
     return (
         <div className='flex w-full h-screen justify-center items-center'>
             <div>
-                <div className='flex w-full justify-end max-w-3xl uppercase font-extralight'>
+                <div className='flex w-full justify-end w-3xl uppercase font-extralight'>
                     {currentPlayer.currentQuestionIndex + 1} / {quiz.length} questions
                 </div>
                 <Game playersState={playersStateSorted} quizLength={quiz.length} />
                 <QuizQuestions quiz={quiz} currentPlayer={currentPlayer} socket={socket} />
-                <button onClick={moveCurrentPlayer}>test</button>
             </div>
         </div>
     );

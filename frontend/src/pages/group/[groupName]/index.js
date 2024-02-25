@@ -11,18 +11,31 @@ const testName = 'kayla';
 
 const GroupPage = () => {
     const [gameState, setGameState] = useState('lobby');
+    const [loadingQuestionCount, setLoadingQuestionCount] = useState(0);
     const [winner, setWinner] = useState(null);
+    const [tiers, setTiers] = useState(null);
     const [playersState, setPlayerState] = useState(null);
     const [quiz, setQuiz] = useState(null);
 
     useEffect(() => {
         socket.emit('joinGame', testName);
 
+        socket.on('gameEnd', name => {
+            if (name === testName) {
+                setGameState('end');
+            }
+        });
+
+        socket.on('gameTie', name => {
+            setTiers(name);
+        });
+
         socket.on('gameWon', name => {
             setWinner(name);
         });
 
-        socket.on('loadingGame', () => {
+        socket.on('loadingGame', number => {
+            setLoadingQuestionCount(number);
             setGameState('loading');
         });
 
@@ -42,6 +55,7 @@ const GroupPage = () => {
 
         return () => {
             socket.emit('leaveGame', testName);
+            socket.close();
         };
     }, []);
 
@@ -50,6 +64,22 @@ const GroupPage = () => {
     };
 
     const isQuizReady = quiz?.length > 0 && playersState;
+
+    if (gameState === 'end') {
+        return (
+            <div className='w-full h-screen flex flex-col justify-center items-center'>
+                <Header>{tiers}Waiting for others to finished</Header>
+            </div>
+        );
+    }
+
+    if (tiers) {
+        return (
+            <div className='w-full h-screen flex flex-col justify-center items-center'>
+                <Header>{tiers} tied!</Header>
+            </div>
+        );
+    }
 
     if (winner) {
         return (
@@ -64,7 +94,7 @@ const GroupPage = () => {
             {gameState === 'lobby' && <Lobby />}
             {gameState === 'loading' && (
                 <div className='w-full h-screen flex flex-col justify-center items-center'>
-                    <Header>Creating your next mission</Header>
+                    <Header>Creating your next mission {loadingQuestionCount * 20}%</Header>
                 </div>
             )}
             {gameState === 'quiz' && isQuizReady && (
