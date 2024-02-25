@@ -77,7 +77,7 @@ const GroupPage = () => {
 
     if (tiers) {
         return (
-            <div className='w-full h-screen flex flex-col justify-center items-center'>
+            <div className='flex flex-col items-center justify-center w-full h-screen'>
                 <Header>{tiers} tied!</Header>
             </div>
         );
@@ -85,7 +85,7 @@ const GroupPage = () => {
 
     if (winner) {
         return (
-            <div className='w-full h-screen flex flex-col justify-center items-center'>
+            <div className='flex flex-col items-center justify-center w-full h-screen'>
                 <Header>{winner} won!</Header>
             </div>
         );
@@ -93,7 +93,7 @@ const GroupPage = () => {
 
     if (!winner && !tiers && gameState === 'end') {
         return (
-            <div className='w-full h-screen flex flex-col justify-center items-center'>
+            <div className='flex flex-col items-center justify-center w-full h-screen'>
                 <Header>Waiting for others to finished!</Header>
             </div>
         );

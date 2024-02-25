@@ -39,7 +39,7 @@ export function Spaces() {
     };
 
     return (
-        <div className={`${inter.className} w-full h-screen flex flex-col justify-center items-center`}>
+        <div className={`${inter.className} w-full h-screen flex flex-col justify-center items-center no-scrollbar`}>
             <div className='flex gap-10'>
                 <motion.div
                     className='relative w-96'
@@ -79,7 +79,7 @@ export function Spaces() {
                     </div>
 
                     <ul className='flex flex-col gap-4 overflow-auto'>
-                        <div className='flex flex-col gap-4 max-h-[500px] overflow-auto'>
+                        <div className='flex flex-col gap-4 max-h-[500px] overflow-auto no-scrollbar'>
                             {groups?.map((group, idx) => (
                                 <motion.li
                                     transition={{ delay: 0.3 * idx, duration: 0.5, ease: 'easeIn' }}
@@ -88,8 +88,7 @@ export function Spaces() {
                                         y: [10, 0],
                                     }}
                                     key={group.id}
-                                    className='flex items-center justify-between pb-4 uppercase border-b border-white
-                                    font-extralight w-88'>
+                                    className='flex items-center justify-between pb-4 uppercase border-b border-white font-extralight w-88'>
                                     <h3>{group.name}</h3>
                                     <div className='flex items-center gap-4'>
                                         <Button
@@ -108,7 +107,7 @@ export function Spaces() {
             </div>
 
             <div
-                className='absolute flex-col items-center justify-center h-screen bg-slate-900 w-full bg-opacity-80'
+                className='absolute flex-col items-center justify-center w-full h-screen bg-slate-900 bg-opacity-80'
                 style={{ display: isModalOpen ? 'flex' : 'none' }}>
                 <form
                     className='flex flex-col gap-4 min-w-2.5 focus:text-white focus:ring-2 focus:ring-white'
@@ -116,7 +115,7 @@ export function Spaces() {
                     <input
                         type='text'
                         placeholder='Space Name'
-                        className='focus:border-blue-500 px-4 py-2 border-b border-b-slate-50 bg-transparent text-black placeholder-white'
+                        className='px-4 py-2 text-black placeholder-white bg-transparent border-b focus:border-blue-500 border-b-slate-50'
                         value={spaceName}
                         onChange={e => setSpaceName(e.target.value)}
                     />
