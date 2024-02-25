@@ -90,8 +90,15 @@ io.on('connection', function (socket) {
 
     socket.on('joinGame', async playerName => {
         console.log('joinGame');
-        console.log(playersInGame);
-        playersInGame.push(playerName);
+        if (!playersInGame.find(player => player.displayName === playerName)) {
+            console.log(playersInGame);
+            playersInGame.push({
+                id: playersInGame.length,
+                displayName: playerName,
+                point: 0,
+                currentQuestionIndex: 0,
+            });
+        }
     });
 
     socket.on('leaveGame', async playerName => {
@@ -182,16 +189,9 @@ io.on('connection', function (socket) {
             },
         ];
 
-        const createPlayerData = playersInGame.map((player, idx) => ({
-            id: idx,
-            displayName: player,
-            point: 0,
-            currentQuestionIndex: 0,
-        }));
-        playersInGame = createPlayerData;
         maxQuestion = mockQuestion.length;
 
-        socket.emit('initialGameData', { questions: mockQuestion, createPlayerData });
+        socket.emit('initialGameData', { questions: mockQuestion, createPlayerData: playersInGame });
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
