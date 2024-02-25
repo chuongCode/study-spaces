@@ -10,7 +10,6 @@ const GroupQuiz = db.GroupQuiz;
 const Group = db.Group;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const expressSwagger = require('express-swagger-generator')(app);
 const srvConfig = require('./config');
 const { CONNECTION_TYPE, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_PORT, DB_NAME, DB_QUERY_PARAMS } = srvConfig;
 const dbAuthString = DB_USERNAME && DB_PASSWORD ? `${srvConfig.DB_USERNAME}:${srvConfig.DB_PASSWORD}@` : '';
@@ -47,7 +46,6 @@ app.use('/api', require('./routes/api'));
 /**
  * Swagger UI documentation
  */
-if (srvConfig.SWAGGER_SETTINGS.enableSwaggerUI) expressSwagger(srvConfig.SWAGGER_SETTINGS);
 
 /**
  * Configure http(s)Server
@@ -81,47 +79,43 @@ const io = require('socket.io')(httpServer, {
     },
 });
 
+let maxQuestion = 0;
+let playersInGame = [];
+
 io.on('connection', function (socket) {
     console.log(`Connection join (${socket.id})`);
     socket.on('connection', () => {
         console.log('Connection recieved');
     });
 
-    // given a room ID, make a connection to the room
-<<<<<<< HEAD
-    socket.on('join', roomId => {});
+    socket.on('joinGame', async playerName => {
+        console.log('joinGame');
+        console.log(playersInGame);
+        playersInGame.push(playerName);
+    });
 
-    const quizId = '1';
+    socket.on('leaveGame', async playerName => {
+        playersInGame = playersInGame.filter(player => player !== playerName);
+    });
+
+    socket.on('answer', async playerName => {
+        playersInGame = playersInGame.filter(player => player !== playerName);
+    });
 
     socket.on('startGame', async groupId => {
-        socket.emit('Game loading');
+        console.log('startGame');
+        socket.emit('loadingGame');
         const questionList = await callAIAboutContent(groupId);
-=======
-    socket.on('join-room', roomId => {
-        console.log(`Connection joined room ${roomId}`);
-        // socket.join(roomId);
-        socket.emit('test');
-    });
-    
-    socket.on('start-game', async (groupId) => {
 
-        // await startGameInDatabase();
-        // /find the group by ID
-        const group = await Group.findByPk(groupId);
-        
-        // /set group active
-        group.status = 'active';
-        await group.save();
+        const createPlayerData = playersInGame.map((player, idx) => ({
+            id: idx,
+            displayName: player,
+            point: 0,
+            currentQuestionIndex: 0,
+        }));
+        maxQuestion = questionList.length;
 
-        // const game = await getMultipleChoiceQuestions();
-        const quizQuestions = await GroupQuizQuestion.findAll({
-            where: {
-                quizId: 4
-            }
-        })
-
-        socket.emit('initialGameData', quizQuestions);
->>>>>>> 8d812407f4a357da3ace54a1c4a85c723a333333
+        socket.emit('initialGameData', { questions: questionList, createPlayerData });
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));

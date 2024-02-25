@@ -25,6 +25,7 @@ const GroupQuizQuestion = db.GroupQuizQuestion;
 const GroupQuiz = db.GroupQuiz;
 const Group = db.Group;
 const GroupContent = db.GroupContent;
+const User = db.User;
 
 init.get('/', async function (req, res, next) {
     res.json({
@@ -44,6 +45,17 @@ init.post('/createGroup', async function (req, res, next) {
     const group = await Group.create({ name, status: 'inactive' });
     res.json(group);
     console.log(group);
+});
+
+//create user
+init.post('/login', async function (req, res, next) {
+    const username = req.body.username;
+    //check if user exists
+    const search = await User.findOne({ where: { name: username } });
+    if (search === null) {
+        await User.create({ name: username });
+        console.log('New User created');
+    }
 });
 
 // create group quiz then create groupquizquestions
@@ -91,6 +103,9 @@ init.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
+        if (!req.body.groupId) {
+            return res.status(400).json({ error: 'No groupid given' });
+        }
 
         // Retrieve the uploaded file from the request body
         const uploadedFile = req.file;
@@ -101,13 +116,18 @@ init.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
         const fileData = fs.readFileSync(filePath, 'utf8');
         await processFileData(fileData);
 
+        const groupId = req.body.groupId;
+        console.log('groupId: ', groupId);
+
+        // coneo
+
         // Determine the file type
         const fileExtension = uploadedFile.mimetype ? uploadedFile.mimetype : null;
 
         // Check if the file is already in PDF format
         if (fileExtension === 'application/pdf') {
             // Process the PDF directly
-            await processPDF(filePath, res);
+            await processPDF(filePath, res, groupId);
         } else {
             // Convert the file to PDF
             const convertedFilePath = await convertToPDF(filePath);
@@ -133,12 +153,14 @@ function processFileData(fileData) {
 }
 
 // Function to process the PDF and count word occurrences
-async function processPDF(pdfFilePath, res) {
+async function processPDF(pdfFilePath, res, groupId) {
     try {
         // Parse the PDF content
         const pdfBuffer = fs.readFileSync(pdfFilePath);
         const data = await PDFParser(pdfBuffer);
         const pdfText = data.text;
+        //create a GroupContent with the pdfText and groupId
+        await GroupContent.create({ content: pdfText, groupId: 1 });
         res.json({ pdfText });
     } catch (error) {
         console.error('An error occurred while processing the PDF:', error);
