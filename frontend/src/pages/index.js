@@ -8,6 +8,8 @@ import { Inter } from 'next/font/google';
 import { useRouter } from 'next/navigation';
 import { useQuery } from 'react-query';
 import { useState, useEffect } from 'react';
+// Zustand
+import useStore from '@/zustand/store';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,7 +20,7 @@ const getGroups = async () => {
 
 export default function Home() {
     const router = useRouter();
-    const onJoinGroup = id => {
+    const onJoinGroup = (name, id) => {
         router.push(`/group/${id}`);
     };
     const { isLoading, data: groups, error } = useQuery(['groups'], getGroups);
@@ -28,10 +30,13 @@ export default function Home() {
         event.preventDefault();
         if (spaceName) {
             await api.post('/createGroup', { name: spaceName });
+            //add spaceName to store
+            useStore.setState({ spaceName });
             router.push(`/group/${spaceName}`);
             setIsModalOpen(false);
         }
     };
+    // /Users/jassemtoumi/Desktop/SideProjects/brickHack/brickhacks/frontend/src/zustand/store.js
 
     return (
         <div className={`${inter.className} w-full h-screen flex flex-col justify-center items-center`}>
@@ -46,14 +51,14 @@ export default function Home() {
                     <ul className='flex flex-col gap-4 h-[500px]  overflow-auto'>
                         {groups?.map(group => (
                             <li
-                                key={group.id}
+                                key={group.name}
                                 className='flex items-center justify-between pb-4 uppercase border-b border-white font-extralight w-88'>
                                 <h3>{group.name}</h3>
                                 <div className='flex items-center gap-4'>
                                     <div>{group.playerCount} / 5</div>
                                     <Button
                                         onClick={() => {
-                                            onJoinGroup(group.id);
+                                            onJoinGroup(group.name, group.id);
                                         }}>
                                         {group.status === 'inactive' ? 'Join' : 'Full'}
                                     </Button>
