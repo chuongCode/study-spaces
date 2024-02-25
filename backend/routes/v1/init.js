@@ -209,6 +209,7 @@ Options:
 Correct Answer: A@@
 #################
 This time when I give you the content. Generate 5 sets of multiple choice question and answers in the example format above.
+NOTE !!!! [DO NOT GIVE ME ANY INTRO, JUST GIVE ME THE QUESTION AND ANSWERS AS SHOWN IN THE EXAMPLE ABOVE]
 
 Content: ${req.body.content}
 `;
@@ -223,13 +224,14 @@ Content: ${req.body.content}
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${API_TOKEN}`,
                 },
-                body: JSON.stringify({ prompts: prompt }),
+                body: JSON.stringify({prompts: [prompt]}),
             }
         );
         if (!response.ok) {
             throw new Error('Failed to fetch AI response');
         }
         const responseData = await response.json();
+        console.log(responseData);
         const groupId = req.body.groupId;
         //make api call to get content
         const content = await GroupContent.findOne({ where: { groupId: groupId } });
