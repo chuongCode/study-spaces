@@ -16,12 +16,16 @@ const mammoth = require('mammoth');
 const pdf = require('html-pdf');
 const upload = multer({ storage });
 const PDFParser = require('pdf-parse');
+const fetch = require('node-fetch');
+const dotenv = require('dotenv');
+dotenv.config();
 const Sequelize = require('sequelize');
 const db = require('../../models');
 const { group } = require('console');
 const GroupQuizQuestion = db.GroupQuizQuestion;
 const GroupQuiz = db.GroupQuiz;
 const Group = db.Group;
+const GroupContent = db.GroupContent;
 
 init.get('/', async function (req, res, next) {
     res.json({
@@ -45,40 +49,39 @@ init.post('/createGroup', async function (req, res, next) {
 
 // create group quiz then create groupquizquestions
 init.get('/createTestQuiz', async function (req, res, next) {
-    
-    const quiz = await GroupQuiz.create({ groupId: 1});
+    const quiz = await GroupQuiz.create({ groupId: 1 });
 
     const quizQuestion1 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Got Milk?',
         answers: ['Yes', 'No', 'Maybe'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion2 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Where is Waldo?',
         answers: ['Idk', 'Here!', 'There?'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion3 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'What is in your wallet?',
         answers: ['CapitalOne', 'MasterCard', 'Visa'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion4 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Where is Kayla going to work?',
         answers: ['Ramp', 'LinkedIn', 'Brex'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion5 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Do you know the way?',
         answers: ['I kno de wae', 'No', 'What is the way?'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
-    
+
     res.json(quiz);
     console.log(quiz);
 });
@@ -168,6 +171,127 @@ async function convertToPDF(filePath) {
                 reject(error);
             });
     });
+}
+
+init.post('/ai-request', async (req, res) => {
+    try {
+        // get groupId from req
+        // get content from GroupContent where groupId = groupId
+        // create a promt from the content : "The content of the group is: " + content
+        // send the prompt to the AI
+        // send the response to the client
+        // create a GroupQuiz with the response and groupId (store the response in the database for future use)
+        const test =
+            'Team Development 5 team roles * Design Team Lead (DTL) * Ensure organization needs are met and on time * If someone is falling behind/not meeting standards… talk to them * Responsible for quality of client’s engagement * Design team lead is a senior designer - regardless of discipline and has exposures to others * Team lead is sufficiently involved to understand what’s going on * There is no separation of business responsibility and design responsibilities * Understand POV of each discipline * Not fully invested in project * Develops initial research plan - done in consultation with the rest of the team * Works closely with visual and industrial designers on how the visual and physical design communicates system’s behavior * Relative importance of information of the behavior of widgets and physical controls * Reviews design documentation developed by IxD synthesizer';
+
+        const prompt = `You are an intelligent agent that creates multiple choice questions based out of the topic of the contents that I give you.
+
+You should generate one question, and 4 possible multiple choice answers that could answer the question. One of the answers should be the only correct answer. Lastly, from the answers you create say the letter of the correct answer. Give the generated question as <question>. On the next line list the four possible multiple choice answers from letters A to D respectively. On the last line, give the correct answer letter as 'Correct Option is: <letter>' ending with '@@'.
+
+Follow this format to showcase the question:
+The question and possible answers should be maximum 50 words. Start each question with @@. Try and relax and work on generating this question step by step:
+
+@@Question: <question>
+A. <multiple choice answer>
+B. <multiple choice answer>
+C. <multiple choice answer>
+D. <multiple choice answer>
+Correct Option is <letter>@@
+
+End the answer with '@@' to indicate the end of the answer.
+
+#### Example ####
+Content: Nonrenewable energy resources include coal, natural gas, oil, and nuclear energy. Once these resources are used up, they cannot be replaced, which is a major problem for humanity as we are currently dependent on them to supply most of our energy needs.
+
+@@Question: What is an example of non renewable energy?
+Options: 
+(A) Coal
+(B) Solar Energy
+(C) Wind turbine energy 
+(D) Crops
+Correct Answer: A@@
+#################
+
+Content: ${test}
+`;
+
+        //console.log(req.body.content);
+
+        // Read the content of the text file containing the prompt
+        const API_TOKEN = process.env.API_KEY;
+        const response = await fetch(
+            `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${API_TOKEN}`,
+                },
+                body: JSON.stringify({ prompt }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error('Failed to fetch AI response');
+        }
+        const responseData = await response.json();
+        const groupId = req.body.groupId;
+        //make api call to get content
+        //const content = await GroupContent.findOne({ where: { groupId: groupId } });
+
+        //Create a GroupQuizQuestion with the response and groupId
+
+        res.json(splitOnNewLines);
+    } catch (error) {
+        console.error('Error calling AI worker:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+function parseQuestion(input) {
+    // Split the input into lines
+    const lines = input.split('\n');
+
+    // Extract the question
+    const question = lines[0].trim().split(': ')[1];
+
+    // Extract the options
+    const options = [];
+    for (let i = 1; i <= 4; i++) {
+        options.push(lines[i].trim().substring(3));
+    }
+
+    // Extract the correct option index
+    let correctOptionIndex;
+    const correctOptionLine = lines.find(line => line.includes('Correct Option is:'));
+    if (correctOptionLine) {
+        const correctOptionLetter = correctOptionLine.trim().split(': ')[1].trim();
+        correctOptionIndex = correctOptionLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+    }
+
+    // Return the parsed data
+    return {
+        question: question,
+        options: options,
+        correctOptionIndex: correctOptionIndex,
+    };
+}
+
+function extractStrings(input) {
+    var matches = [];
+    var startIndex = 0;
+    var endIndex = 0;
+
+    while (startIndex !== -1 && endIndex !== -1) {
+        startIndex = input.indexOf('@@', endIndex);
+        if (startIndex !== -1) {
+            endIndex = input.indexOf('@@', startIndex + 2);
+            if (endIndex !== -1) {
+                matches.push(input.substring(startIndex + 2, endIndex));
+            }
+        }
+    }
+
+    return matches;
 }
 
 module.exports = init;
