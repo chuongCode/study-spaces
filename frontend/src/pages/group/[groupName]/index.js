@@ -2,12 +2,10 @@ import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import Lobby from '@/components/Lobby';
 import { Quiz } from '@/components/Quiz/Quiz';
+import { useSocket } from '@/zustand/socket';
+import { useUserName } from '@/zustand/store';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:3005');
-
-const testName = 'kayla';
 
 const GroupPage = () => {
     const [gameState, setGameState] = useState('lobby');
@@ -16,62 +14,65 @@ const GroupPage = () => {
     const [tiers, setTiers] = useState(null);
     const [playersState, setPlayerState] = useState(null);
     const [quiz, setQuiz] = useState(null);
+    const { username } = useUserName();
+    const router = useRouter();
+    const { socket } = useSocket();
+    console.log('socket');
+    console.log(socket);
 
     useEffect(() => {
-        socket.emit('joinGame', testName);
+        if (!username) {
+            router.push('/');
+        } else {
+            socket.emit('joinGame', username);
 
-        socket.on('gameEnd', name => {
-            if (name === testName) {
+            socket.on('gameEnd', () => {
+                console.log('game end');
                 setGameState('end');
-            }
-        });
+            });
 
-        socket.on('gameTie', name => {
-            setTiers(name);
-        });
+            socket.on('gameTie', name => {
+                setTiers(name);
+            });
 
-        socket.on('gameWon', name => {
-            setWinner(name);
-        });
+            socket.on('gameWon', name => {
+                setWinner(name);
+            });
 
-        socket.on('loadingGame', number => {
-            setLoadingQuestionCount(number);
-            setGameState('loading');
-        });
+            socket.on('loadingGame', number => {
+                setLoadingQuestionCount(number);
+                setGameState('loading');
+            });
 
-        socket.on('gameUpdate', data => {
-            console.log('game update');
-            setPlayerState(data);
-        });
+            socket.on('gameUpdate', data => {
+                console.log('game update');
+                setPlayerState(data);
+            });
 
-        socket.on('initialGameData', data => {
-            setGameState('quiz');
-            if (data) {
-                setPlayerState(data.createPlayerData);
-                setQuiz(data.questions);
-            } else {
-            }
-        });
+            socket.on('initialGameData', data => {
+                setGameState('quiz');
+                if (data) {
+                    setPlayerState(data.createPlayerData);
+                    setQuiz(data.questions);
+                } else {
+                }
+            });
+        }
 
         return () => {
-            socket.emit('leaveGame', testName);
-            socket.close();
+            if (socket) {
+                socket.emit('leaveGame', username);
+                socket.close();
+            }
         };
     }, []);
 
     const startGame = () => {
-        socket.emit('startGame');
+        console.log('emit start game');
+        socket?.emit('startGame');
     };
 
     const isQuizReady = quiz?.length > 0 && playersState;
-
-    if (gameState === 'end') {
-        return (
-            <div className='w-full h-screen flex flex-col justify-center items-center'>
-                <Header>{tiers}Waiting for others to finished</Header>
-            </div>
-        );
-    }
 
     if (tiers) {
         return (
@@ -89,6 +90,14 @@ const GroupPage = () => {
         );
     }
 
+    if (!winner && !tiers && gameState === 'end') {
+        return (
+            <div className='w-full h-screen flex flex-col justify-center items-center'>
+                <Header>Waiting for others to finished!</Header>
+            </div>
+        );
+    }
+
     return (
         <div>
             {gameState === 'lobby' && <Lobby />}
@@ -98,7 +107,7 @@ const GroupPage = () => {
                 </div>
             )}
             {gameState === 'quiz' && isQuizReady && (
-                <Quiz playersState={playersState} quiz={quiz} playerName={testName} socket={socket} />
+                <Quiz playersState={playersState} quiz={quiz} playerName={username} socket={socket} />
             )}
             <Button onClick={startGame}>Start Game</Button>
         </div>

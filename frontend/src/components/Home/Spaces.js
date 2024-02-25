@@ -48,24 +48,26 @@ export function Spaces() {
                 <div>
                     <Header>Study Spaces</Header>
 
-                    <ul className='flex flex-col gap-4 h-[500px]  overflow-auto'>
+                    <ul className='flex flex-col gap-4  overflow-auto'>
                         <p className='font-extralight'>Welcome back {username}</p>
-                        {groups?.map(group => (
-                            <li
-                                key={group.id}
-                                className='flex items-center justify-between pb-4 uppercase border-b border-white font-extralight w-88'>
-                                <h3>{group.name}</h3>
-                                <div className='flex items-center gap-4'>
-                                    <div>{group.playerCount} / 5</div>
-                                    <Button
-                                        onClick={() => {
-                                            onJoinGroup(group.id);
-                                        }}>
-                                        {group.status === 'inactive' ? 'Join' : 'Full'}
-                                    </Button>
-                                </div>
-                            </li>
-                        ))}
+                        <div className='flex flex-col gap-4 max-h-[500px]overflow-auto'>
+                            {groups?.map(group => (
+                                <li
+                                    key={group.id}
+                                    className='flex items-center justify-between pb-4 uppercase border-b border-white font-extralight w-88'>
+                                    <h3>{group.name}</h3>
+                                    <div className='flex items-center gap-4'>
+                                        <div>{group.playerCount} / 5</div>
+                                        <Button
+                                            onClick={() => {
+                                                onJoinGroup(group.id);
+                                            }}>
+                                            {group.status === 'inactive' ? 'Join' : 'Full'}
+                                        </Button>
+                                    </div>
+                                </li>
+                            ))}
+                        </div>
                         <Button onClick={() => setIsModalOpen(!isModalOpen)}>Create Your Space</Button>
                     </ul>
                 </div>
@@ -74,7 +76,9 @@ export function Spaces() {
             <div
                 className='absolute flex-col items-center justify-center h-screen bg-slate-900 w-full bg-opacity-80'
                 style={{ display: isModalOpen ? 'flex' : 'none' }}>
-                <form className='flex flex-col gap-4 min-w-2.5 ' onClick={handleCreateGroup}>
+                <form
+                    className='flex flex-col gap-4 min-w-2.5 focus:text-white focus:ring-2 focus:ring-white'
+                    onClick={handleCreateGroup}>
                     <input
                         type='text'
                         placeholder='Space Name'

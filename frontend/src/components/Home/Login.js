@@ -17,8 +17,8 @@ export const Login = ({ setIsSubmit }) => {
             <input
                 type='text'
                 placeholder='Username'
-                className='px-4 py-2 border-b border-b-slate-50 bg-transparent text-white'
-                value={username}
+                className='focus:text-white focus:ring-2 focus:ring-white px-4 py-2 border-b border-b-slate-50 bg-transparent text-white'
+                value={username ?? ''}
                 onChange={e => setUsername(e.target.value)}
             />
             <Button onClick={submit}>Login</Button>

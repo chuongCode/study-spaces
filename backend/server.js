@@ -89,9 +89,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('joinGame', async playerName => {
-        console.log('joinGame');
         if (!playersInGame.find(player => player.displayName === playerName)) {
-            console.log(playersInGame);
             playersInGame.push({
                 id: playersInGame.length,
                 displayName: playerName,
@@ -106,31 +104,35 @@ io.on('connection', function (socket) {
     });
 
     socket.on('answer', async ({ name, isCorrect }) => {
-        console.log('answer', { name, isCorrect });
         let isEnd = false;
         playersInGame = playersInGame.map(player => {
             if (player.displayName === name) {
                 // last
-                if (player.currentQuestionIndex + 1 === maxQuestion) {
-                    console.log('finished');
+                if (player.currentQuestionIndex === maxQuestion - 1) {
+                    console.log('end game 1');
+
                     isEnd = true;
+                    return {
+                        ...player,
+                        point: isCorrect ? player.point + 1 : player.point,
+                        currentQuestionIndex: player.currentQuestionIndex,
+                        isEnd: true,
+                    };
                 }
 
                 return {
                     ...player,
                     point: isCorrect ? player.point + 1 : player.point,
                     currentQuestionIndex: player.currentQuestionIndex + 1,
-                    isEnd: true,
+                    isEnd: false,
                 };
             }
             return player;
         });
-        console.log('after players in game');
 
         if (isEnd) {
-            console.log('game won');
             // every one end
-            if (playersInGame.every(player => player?.isEnd)) {
+            if (playersInGame.every(player => player?.isEnd === true)) {
                 let highestPoint = -Infinity;
                 playersInGame.forEach(player => {
                     if (player.point > highestPoint) {
@@ -139,29 +141,25 @@ io.on('connection', function (socket) {
                 });
                 // Find all objects with the highest point value
                 const playersWithHighestPoint = playersInGame.filter(player => player.point === highestPoint);
-                console.log('game ended winner:');
-                console.log(playersWithHighestPoint);
                 if (playersWithHighestPoint.length > 1) {
-                    socket.emit('gameTie', playersWithHighestPoint.map(player => player.displayName).join(' '));
+                    io.sockets.emit('gameTie', playersWithHighestPoint.map(player => player.displayName).join(' '));
                 } else {
-                    socket.emit('gameWon', playersWithHighestPoint[0].displayName);
+                    io.sockets.emit('gameWon', playersWithHighestPoint[0].displayName);
                 }
             } else {
-                socket.emit('gameEnd', name);
+                console.log('end game 2');
+                socket.emit('gameEnd');
             }
 
             return;
         } else {
-            console.log('game update');
-            console.log(playersInGame);
-            socket.emit('gameUpdate', playersInGame);
+            io.sockets.emit('gameUpdate', playersInGame);
         }
     });
 
     socket.on('startGame', async groupId => {
-        console.log('startGame');
-
-        socket.emit('loadingGame', 0);
+        console.log('START GAME!!!');
+        io.sockets.emit('loadingGame', 0);
         const callAIAboutContent = async groupId => {
             try {
                 // Given group Id, get all the group content
@@ -174,8 +172,6 @@ io.on('connection', function (socket) {
                 let questions = [];
 
                 const prompt = addContentToPrompt(content);
-                console.log('prompt added!');
-                console.log(prompt);
                 const API_TOKEN = process.env.API_KEY;
                 const response = await fetch(
                     `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
@@ -192,7 +188,6 @@ io.on('connection', function (socket) {
                     throw new Error('Failed to fetch AI response');
                 }
                 const responseData = await response.json();
-                console.log(responseData);
 
                 const contentRes = responseData.result.response;
                 const question = contentRes.split('\n').slice(1);
@@ -201,8 +196,7 @@ io.on('connection', function (socket) {
                 let count = 0;
                 for (const q of question) {
                     count++;
-                    socket.emit('loadingGame', count);
-                    console.log('question to be answered:  ' + q);
+                    io.sockets.emit('loadingGame', count);
                     const secondPrompt = addQuestionToPrompt(q);
 
                     const response2 = await fetch(
@@ -218,7 +212,6 @@ io.on('connection', function (socket) {
                     );
                     const responseData2 = await response2.json();
                     const resContentQuestion = responseData2.result.response;
-                    console.log(resContentQuestion);
                     const parsedAnswers = resContentQuestion
                         .split('\n')
                         .slice(0)
@@ -231,7 +224,6 @@ io.on('connection', function (socket) {
                             const description = str.replace(/\//g, '').replace(/"/g, '');
                             return description;
                         });
-                    console.log('correct answer', parsedAnswers);
                     const thirdPrompt = addWrongQuestionToPrompt(q);
 
                     const response3 = await fetch(
@@ -271,10 +263,8 @@ io.on('connection', function (socket) {
                     }
                     const newAnswers = shuffleArray(answers);
                     const correctAnswerIndex = newAnswers.findIndex(answer => answer === correctAnswer);
-                    console.log({ question: q, answers: newAnswers, correctAnswerIndex });
                     questionsList.push({ question: q, answers: newAnswers, correctAnswerIndex });
                 }
-                console.log(questionsList);
                 return questionsList;
             } catch (error) {
                 console.error('Error calling AI worker:', error);
@@ -292,6 +282,7 @@ io.on('connection', function (socket) {
                     'The Hubble Space Telescope was launched.',
                     'The first text message was sent.',
                 ],
+                correctAnswerIndex: 0,
             },
             {
                 question: '2. What technological innovation began to proliferate in the early 2000s?',
@@ -301,6 +292,7 @@ io.on('connection', function (socket) {
                     'Cloud computing and storage services gained popularity.',
                     'The use of artificial intelligence and machine learning in various industries began to increase.',
                 ],
+                correctAnswerIndex: 0,
             },
             {
                 question: '3. What civil rights movement started in 2010?',
@@ -310,6 +302,7 @@ io.on('connection', function (socket) {
                     'The #MeToo movement against sexual harassment and assault began in 2010 with the hashtag #YesAllWomen.',
                     'The Disability Rights movement gained momentum in 2010 with the passage of the Affordable Care Act.',
                 ],
+                correctAnswerIndex: 0,
             },
             {
                 question: '4. What global challenge remains a pressing issue today?',
@@ -319,6 +312,7 @@ io.on('connection', function (socket) {
                     'Access to quality education and healthcare remains a challenge.',
                     'The COVID-19 pandemic continues to affect global economies and societies.',
                 ],
+                correctAnswerIndex: 0,
             },
             {
                 question: '5. What geopolitical tension has been ongoing in the 21st century?',
@@ -327,12 +321,13 @@ io.on('connection', function (socket) {
                     'The Middle East conflict has been a persistent issue.',
                     "North Korea's nuclear program has caused geopolitical concerns.",
                 ],
+                correctAnswerIndex: 0,
             },
         ];
 
-        maxQuestion = mockQuestion.length;
+        maxQuestion = questionList.length;
 
-        socket.emit('initialGameData', { questions: questionList, createPlayerData: playersInGame });
+        io.sockets.emit('initialGameData', { questions: questionList, createPlayerData: playersInGame });
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
