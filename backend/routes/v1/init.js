@@ -16,6 +16,9 @@ const mammoth = require('mammoth');
 const pdf = require('html-pdf');
 const upload = multer({ storage });
 const PDFParser = require('pdf-parse');
+const fetch = require('node-fetch');
+const dotenv = require('dotenv');
+dotenv.config();
 const Sequelize = require('sequelize');
 const db = require('../../models');
 const { group } = require('console');
@@ -169,5 +172,4 @@ async function convertToPDF(filePath) {
             });
     });
 }
-
 module.exports = init;
