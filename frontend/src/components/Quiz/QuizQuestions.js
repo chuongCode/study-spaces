@@ -18,7 +18,7 @@ export const QuizQuestions = ({ quiz, currentPlayer, socket }) => {
             <h1 className='uppercase tracking-widest text-xl font-extralight pb-8' style={{ letterSpacing: '0.5rem' }}>
                 {quiz[index]?.question} ({quiz[index]?.correctAnswerIndex})
             </h1>
-            <div className='flex-1 flex-col justify-center items-center gap-4'>
+            <div className='flex-1 flex-col justify-center items-center gap-4 text-xs'>
                 {quiz[index]?.answers.map((answer, idx) => (
                     <Button
                         key={idx}

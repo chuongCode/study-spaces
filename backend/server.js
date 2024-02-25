@@ -97,6 +97,7 @@ io.on('connection', function (socket) {
                 currentQuestionIndex: 0,
             });
         }
+        io.sockets.emit('lobby', playersInGame);
     });
 
     socket.on('leaveGame', async playerName => {

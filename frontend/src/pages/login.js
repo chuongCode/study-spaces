@@ -9,7 +9,7 @@ import { useQuery } from 'react-query';
 const login = () => {
     const [username, setUsername] = useState('');
     const router = useRouter();
-    const handleOnClick = (e) => {
+    const handleOnClick = e => {
         e.preventDefault();
         if (username !== '') {
             console.log(username);
@@ -24,7 +24,7 @@ const login = () => {
                 <input
                     type='text'
                     placeholder='Username'
-                    className='rounded-lg px-4 py-2 border-b border-b-slate-50 bg-transparent text-white'
+                    className='focus:border-blue-500 rounded-lg px-4 py-2 border-b border-b-slate-50 bg-transparent text-white'
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                 />

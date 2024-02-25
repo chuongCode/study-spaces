@@ -82,7 +82,7 @@ export function Spaces() {
                     <input
                         type='text'
                         placeholder='Space Name'
-                        className='px-4 py-2 border-b border-b-slate-50 bg-transparent text-black placeholder-white'
+                        className='focus:border-blue-500 px-4 py-2 border-b border-b-slate-50 bg-transparent text-black placeholder-white'
                         value={spaceName}
                         onChange={e => setSpaceName(e.target.value)}
                     />

@@ -98,18 +98,22 @@ const GroupPage = () => {
         );
     }
 
+    if (gameState === 'lobby') {
+        return <Lobby startGame={startGame} />;
+    }
+
+    if (gameState === 'loading') {
+        return (
+            <div className='w-full h-screen flex flex-col justify-center items-center'>
+                <Header>Creating your next mission {loadingQuestionCount * 20}%</Header>
+            </div>
+        );
+    }
     return (
         <div>
-            {gameState === 'lobby' && <Lobby />}
-            {gameState === 'loading' && (
-                <div className='w-full h-screen flex flex-col justify-center items-center'>
-                    <Header>Creating your next mission {loadingQuestionCount * 20}%</Header>
-                </div>
-            )}
             {gameState === 'quiz' && isQuizReady && (
                 <Quiz playersState={playersState} quiz={quiz} playerName={username} socket={socket} />
             )}
-            <Button onClick={startGame}>Start Game</Button>
         </div>
     );
 };

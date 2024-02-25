@@ -17,7 +17,7 @@ export const Login = ({ setIsSubmit }) => {
             <input
                 type='text'
                 placeholder='Username'
-                className='focus:text-white focus:ring-2 focus:ring-white px-4 py-2 border-b border-b-slate-50 bg-transparent text-white'
+                className='focus:border-blue-500 focus:text-white focus:ring-2 focus:ring-white px-4 py-2 border-b border-b-slate-50 bg-transparent text-white'
                 value={username ?? ''}
                 onChange={e => setUsername(e.target.value)}
             />
