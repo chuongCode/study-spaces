@@ -2,7 +2,7 @@ import { Button } from '@/components/Button';
 import { SpaceShip1 } from '@/components/SpaceShip1';
 import { SpaceShip2 } from '@/components/SpaceShip2';
 import { SpaceShip3 } from '@/components/SpaceShip3';
-import { Header } from '@/components/header';
+import { Header } from '@/components/Header';
 import { api } from '@/lib/axios';
 import { Inter } from 'next/font/google';
 import { useRouter } from 'next/navigation';
