@@ -15,7 +15,7 @@ export const UploadPDF = ({groupId}) => {
         // add group id to form data
         formData.append('groupId', groupId);
 
-        // console.log('test formData:  ', formData);
+        console.log('test formData:  ', formData);
         //add group id to form data
 
         const response = await api.post('/upload-pdf', formData, {
