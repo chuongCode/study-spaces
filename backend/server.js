@@ -4,6 +4,10 @@ const app = express();
 const http = require('http');
 const cors = require('cors');
 const session = require('express-session');
+const db = require('./models');
+const GroupQuizQuestion = db.GroupQuizQuestion;
+const GroupQuiz = db.GroupQuiz;
+const Group = db.Group;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const expressSwagger = require('express-swagger-generator')(app);
@@ -87,21 +91,25 @@ io.on('connection', function (socket) {
         // socket.join(roomId);
         socket.emit('test');
     });
-
-    const quizId = '1';
     
-    socket.on('startGame', async (groupId) => {
+    socket.on('start-game', async (groupId) => {
 
         // await startGameInDatabase();
         // /find the group by ID
-        // /set group active
+        const group = await Group.findByPk(groupId);
         
-
-        // await setGameToActive();
+        // /set group active
+        group.status = 'active';
+        await group.save();
 
         // const game = await getMultipleChoiceQuestions();
+        const quizQuestions = await GroupQuizQuestion.findAll({
+            where: {
+                quizId: 4
+            }
+        })
 
-        // socket.emit('initialGameData', game);
+        socket.emit('initialGameData', quizQuestions);
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));

@@ -20,6 +20,7 @@ const JoinRoomButton = ({ room }) => {
         if (socket) {
             console.log('click');
             socket.emit('join-room', room);
+            socket.emit('start-game', 1);
         }
     };
 
