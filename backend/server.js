@@ -4,6 +4,10 @@ const app = express();
 const http = require('http');
 const cors = require('cors');
 const session = require('express-session');
+const db = require('./models');
+const GroupQuizQuestion = db.GroupQuizQuestion;
+const GroupQuiz = db.GroupQuiz;
+const Group = db.Group;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const expressSwagger = require('express-swagger-generator')(app);
@@ -84,6 +88,7 @@ io.on('connection', function (socket) {
     });
 
     // given a room ID, make a connection to the room
+<<<<<<< HEAD
     socket.on('join', roomId => {});
 
     const quizId = '1';
@@ -91,6 +96,32 @@ io.on('connection', function (socket) {
     socket.on('startGame', async groupId => {
         socket.emit('Game loading');
         const questionList = await callAIAboutContent(groupId);
+=======
+    socket.on('join-room', roomId => {
+        console.log(`Connection joined room ${roomId}`);
+        // socket.join(roomId);
+        socket.emit('test');
+    });
+    
+    socket.on('start-game', async (groupId) => {
+
+        // await startGameInDatabase();
+        // /find the group by ID
+        const group = await Group.findByPk(groupId);
+        
+        // /set group active
+        group.status = 'active';
+        await group.save();
+
+        // const game = await getMultipleChoiceQuestions();
+        const quizQuestions = await GroupQuizQuestion.findAll({
+            where: {
+                quizId: 4
+            }
+        })
+
+        socket.emit('initialGameData', quizQuestions);
+>>>>>>> 8d812407f4a357da3ace54a1c4a85c723a333333
     });
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));

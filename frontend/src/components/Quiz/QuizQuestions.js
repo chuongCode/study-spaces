@@ -1,15 +1,16 @@
 import React from 'react';
-import { Header } from '../header';
 import { Button } from '../Button';
+import { Header } from '../Header';
 
 export const QuizQuestions = ({ quiz, currentPlayer }) => {
-    const currentQuestion = quiz[currentPlayer.currentQuestionIndex];
+    const index = currentPlayer.currentQuestionIndex ?? 0;
+
     return (
         <div className='max-w-4xl mx-auto'>
-            <Header>{currentQuestion.question}</Header>
-            <div className='flex-2 flex-col justify-center items-center gap-4'>
-                {currentQuestion.answers.map((answer, idx) => (
-                    <Button key={idx} className='w-96 m-2'>
+            <Header>{quiz[index]?.question}</Header>
+            <div className='flex-1 flex-col justify-center items-center gap-4'>
+                {quiz[index]?.answers.map((answer, idx) => (
+                    <Button key={idx} className='w-full m-2'>
                         {answer}
                     </Button>
                 ))}

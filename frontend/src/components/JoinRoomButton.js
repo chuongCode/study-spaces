@@ -6,6 +6,8 @@ const socket = io('http://localhost:3005', {
     autoConnect: false,
 });
 
+const testName = 'kayla';
+
 const JoinRoomButton = ({ room }) => {
     const connectSocket = () => {
         socket.connect();
@@ -20,6 +22,7 @@ const JoinRoomButton = ({ room }) => {
         if (socket) {
             console.log('click');
             socket.emit('join-room', room);
+            socket.emit('start-game', 1);
         }
     };
 
