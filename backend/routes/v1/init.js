@@ -26,6 +26,7 @@ const GroupQuizQuestion = db.GroupQuizQuestion;
 const GroupQuiz = db.GroupQuiz;
 const Group = db.Group;
 const GroupContent = db.GroupContent;
+const User = db.User;
 
 init.get('/', async function (req, res, next) {
     res.json({
@@ -45,6 +46,17 @@ init.post('/createGroup', async function (req, res, next) {
     const group = await Group.create({ name, status: 'inactive' });
     res.json(group);
     console.log(group);
+});
+
+//create user
+init.post('/login', async function (req, res, next) {
+    const username = req.body.username;
+    //check if user exists
+    const search = await User.findOne({ where: { name: username } });
+    if (search === null) {
+        await User.create({ name: username });
+        console.log('New User created');
+    }
 });
 
 // create group quiz then create groupquizquestions
@@ -106,7 +118,7 @@ init.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
         await processFileData(fileData);
 
         const groupId = req.body.groupId;
-        console.log("groupId: ", groupId);
+        console.log('groupId: ', groupId);
 
         // coneo
 
@@ -151,7 +163,6 @@ async function processPDF(pdfFilePath, res, groupId) {
         //create a GroupContent with the pdfText and groupId
         await GroupContent.create({ content: pdfText, groupId: 1 });
         res.json({ pdfText });
-
     } catch (error) {
         console.error('An error occurred while processing the PDF:', error);
         res.status(500).json({ error: 'Failed to process the PDF' });
@@ -251,7 +262,7 @@ Content: ${test}
 
         //Create a GroupQuizQuestion with the response and groupId
 
-        res.json(splitOnNewLines);
+        // res.json(splitOnNewLines);
     } catch (error) {
         console.error('Error calling AI worker:', error);
         res.status(500).json({ error: 'Internal Server Error' });
