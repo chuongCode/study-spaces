@@ -91,7 +91,7 @@ io.on('connection', function (socket) {
     socket.on('joinGame', async playerName => {
         if (!playersInGame.find(player => player.displayName === playerName)) {
             playersInGame.push({
-                id: playersInGame.length,
+                id: socket.id,
                 displayName: playerName,
                 point: 0,
                 currentQuestionIndex: 0,
@@ -225,7 +225,11 @@ io.on('connection', function (socket) {
         io.sockets.emit('initialGameData', { questions: questionList, createPlayerData: playersInGame });
     });
 
-    socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
+    socket.on('disconnect', () => {
+        playersInGame = playersInGame.filter(player => player.id !== socket.id);
+        console.log(`Connection left (${socket.id})`);
+        io.sockets.emit('lobby', playersInGame);
+    });
 });
 
 const callAIAboutContent = async (groupId, callback) => {
