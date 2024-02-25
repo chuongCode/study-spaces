@@ -3,7 +3,7 @@ import { SpaceShip1 } from '../SpaceShip1';
 import { useAnimate } from 'framer-motion';
 import Image from 'next/image';
 
-export const AnimatedShip = ({ name, score, currentPlayerQuestionIndex, currentPlayerNumber }) => {
+export const AnimatedShip = ({ isPlayer, name, score, currentPlayerQuestionIndex, currentPlayerNumber }) => {
     const [scope, animate] = useAnimate();
     const [scope2, animate2] = useAnimate();
 
@@ -35,9 +35,15 @@ export const AnimatedShip = ({ name, score, currentPlayerQuestionIndex, currentP
                     ref={scope2}
                     className='rotate-[-90deg] absolute top-[-30px] left-[-100px] z-[0]'
                 />
-                <h3 className='absolute right-4 bottom-2 font-extralight text-sm'>
-                    {name} <span className='bg-blue-500 p-1 text-xs bg-opacity-25 rounded-md'>{score}</span>
-                </h3>
+                {!isPlayer ? (
+                    <h3 className='absolute right-4 bottom-2 font-extralight text-sm'>
+                        {name} <span className='bg-blue-500 p-1 text-xs bg-opacity-25 rounded-md'>{score}</span>
+                    </h3>
+                ) : (
+                    <h3 className='absolute right-4 bottom-2 font-extralight text-sm text-green'>
+                        {name} <span className='bg-blue-500 p-1 text-xs bg-opacity-25 rounded-md'>{score}</span>
+                    </h3>
+                )}
             </div>
         </div>
     );

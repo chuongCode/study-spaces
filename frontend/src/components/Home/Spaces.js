@@ -79,7 +79,7 @@ export function Spaces() {
                     </div>
 
                     <ul className='flex flex-col gap-4 overflow-auto'>
-                        <div className='flex flex-col gap-4 max-h-[500px]overflow-auto'>
+                        <div className='flex flex-col gap-4 max-h-[500px] overflow-auto'>
                             {groups?.map((group, idx) => (
                                 <motion.li
                                     transition={{ delay: 0.3 * idx, duration: 0.5, ease: 'easeIn' }}

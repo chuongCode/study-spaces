@@ -13,7 +13,7 @@ export const Quiz = ({ playersState, quiz, playerName, socket }) => {
                 <div className='flex w-full justify-end w-3xl uppercase font-extralight'>
                     {currentPlayer.currentQuestionIndex + 1} / {quiz.length} questions
                 </div>
-                <Game playersState={playersStateSorted} quizLength={quiz.length} />
+                <Game playersState={playersStateSorted} quizLength={quiz.length} currentPlayer={currentPlayer} />
                 <QuizQuestions quiz={quiz} currentPlayer={currentPlayer} socket={socket} />
             </div>
         </div>
