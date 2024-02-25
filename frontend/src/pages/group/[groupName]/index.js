@@ -6,6 +6,7 @@ import { useSocket } from '@/zustand/socket';
 import { useUserName } from '@/zustand/store';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import ProgressBar from '@ramonak/react-progress-bar';
 
 const GroupPage = () => {
     const [gameState, setGameState] = useState('lobby');
@@ -105,7 +106,16 @@ const GroupPage = () => {
     if (gameState === 'loading') {
         return (
             <div className='w-full h-screen flex flex-col justify-center items-center'>
-                <Header>Creating your next mission {loadingQuestionCount * 20}%</Header>
+                <div className='flex flex-col gap-4 justify-center items-center min-w-sm'>
+                    <Header>Creating your next mission {loadingQuestionCount * 20}%</Header>
+                    <ProgressBar
+                        completed={loadingQuestionCount * 20}
+                        width='300px'
+                        height='3px'
+                        isLabelVisible={false}
+                        bgColor='blue'
+                    />
+                </div>
             </div>
         );
     }
