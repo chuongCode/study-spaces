@@ -29,8 +29,7 @@ export function Spaces() {
     const [spaceName, setSpaceName] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleCreateGroup = async event => {
-        event.preventDefault();
+    const handleCreateGroup = async () => {
         if (spaceName) {
             await api.post('/createGroup', { name: spaceName });
             router.push(`/group/${spaceName}`);
@@ -109,19 +108,24 @@ export function Spaces() {
             <div
                 className='absolute flex-col items-center justify-center w-full h-screen bg-slate-900 bg-opacity-80'
                 style={{ display: isModalOpen ? 'flex' : 'none' }}>
-                <form
-                    className='flex flex-col gap-4 min-w-2.5 focus:text-white focus:ring-2 focus:ring-white'
-                    onClick={handleCreateGroup}>
+                <div className='flex flex-col gap-4 min-w-2.5'>
                     <input
                         type='text'
                         placeholder='Space Name'
-                        className='px-4 py-2 text-black placeholder-white bg-transparent border-b focus:border-blue-500 border-b-slate-50'
+                        className='px-4 py-2 text-white placeholder-white bg-transparent border-b focus:border-blue-500 border-b-slate-50 focus:text-white focus:ring-2 focus:ring-white'
                         value={spaceName}
                         onChange={e => setSpaceName(e.target.value)}
                     />
-                    <Button type='submit'>Confirm</Button>
-                    <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                </form>
+                    <Button type='submit' onClick={handleCreateGroup}>
+                        Confirm
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setIsModalOpen(false);
+                        }}>
+                        Cancel
+                    </Button>
+                </div>
             </div>
         </div>
     );
