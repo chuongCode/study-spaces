@@ -181,71 +181,71 @@ init.post('/ai-request', async (req, res) => {
         // send the prompt to the AI
         // send the response to the client
         // create a GroupQuiz with the response and groupId (store the response in the database for future use)
-        const test =
-            'Team Development 5 team roles * Design Team Lead (DTL) * Ensure organization needs are met and on time * If someone is falling behind/not meeting standards… talk to them * Responsible for quality of client’s engagement * Design team lead is a senior designer - regardless of discipline and has exposures to others * Team lead is sufficiently involved to understand what’s going on * There is no separation of business responsibility and design responsibilities * Understand POV of each discipline * Not fully invested in project * Develops initial research plan - done in consultation with the rest of the team * Works closely with visual and industrial designers on how the visual and physical design communicates system’s behavior * Relative importance of information of the behavior of widgets and physical controls * Reviews design documentation developed by IxD synthesizer';
 
-        const prompt = `You are an intelligent agent that creates multiple choice questions based out of the topic of the contents that I give you.
+        const paragraph1 = `Within the spectrum of design roles, the Visual Designer (VisD) occupies a unique position, where aesthetic appeal converges with functional efficacy. Their primary objective is to imbue products with intuitive and appealing visual cues that enhance usability and desirability. Armed with a deep understanding of graphic design fundamentals, the VisD navigates the intricate interplay between form and function, striving for maximum coherence and impact. Their responsibilities extend beyond mere ornamentation, encompassing the articulation of visual design requirements and the development of a cohesive visual system. By proposing and refining visual strategies, the VisD ensures consensus among team members, aligning design decisions with broader project objectives. Furthermore, their keen eye for detail enables them to identify and rectify inconsistencies, thereby fostering a harmonious visual language that resonates with users on a profound level.`;
 
-You should generate one question, and 4 possible multiple choice answers that could answer the question. One of the answers should be the only correct answer. Lastly, from the answers you create say the letter of the correct answer. Give the generated question as <question>. On the next line list the four possible multiple choice answers from letters A to D respectively. On the last line, give the correct answer letter as 'Correct Option is: <letter>' ending with '@@'.
+        const content = paragraph1;
 
-Follow this format to showcase the question:
-The question and possible answers should be maximum 50 words. Start each question with @@. Try and relax and work on generating this question step by step:
-
-@@Question: <question>
-A. <multiple choice answer>
-B. <multiple choice answer>
-C. <multiple choice answer>
-D. <multiple choice answer>
-Correct Option is <letter>@@
-
-End the answer with '@@' to indicate the end of the answer.
-
-#### Example ####
-Content: Nonrenewable energy resources include coal, natural gas, oil, and nuclear energy. Once these resources are used up, they cannot be replaced, which is a major problem for humanity as we are currently dependent on them to supply most of our energy needs.
-
-@@Question: What is an example of non renewable energy?
-Options: 
-(A) Coal
-(B) Solar Energy
-(C) Wind turbine energy 
-(D) Crops
-Correct Answer: A@@
-#################
-
-Content: ${test}
-`;
-
-        //console.log(req.body.content);
-
-        // Read the content of the text file containing the prompt
-        const API_TOKEN = process.env.API_KEY;
-        const response = await fetch(
-            `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${API_TOKEN}`,
-                },
-                body: JSON.stringify({ prompt }),
+        let questions = [];
+        for (let i = 0; i < 5; i++) {
+            const prompt = addContentToPrompt(
+                content,
+                questions.map(question => question.question)
+            );
+            console.log('prompt added!');
+            console.log(prompt);
+            const API_TOKEN = process.env.API_KEY;
+            const response = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${API_TOKEN}`,
+                    },
+                    body: JSON.stringify({ prompt }),
+                }
+            );
+            if (!response.ok) {
+                throw new Error('Failed to fetch AI response');
             }
-        );
-        if (!response.ok) {
-            throw new Error('Failed to fetch AI response');
+            const responseData = await response.json();
+            console.log(i);
+            console.log(responseData);
+
+            const [matches] = extractStrings(responseData.result.response);
+            console.log(matches);
+            if (!matches) {
+                console.log('input not given');
+            } else {
+                const question = parseQuestion(matches);
+                questions.push(question);
+            }
+            await sleep(300);
         }
-        const responseData = await response.json();
-        const groupId = req.body.groupId;
-        //make api call to get content
-        //const content = await GroupContent.findOne({ where: { groupId: groupId } });
-
-        //Create a GroupQuizQuestion with the response and groupId
-
-        res.json(splitOnNewLines);
+        console.log('final questions');
+        console.log('questions');
+        res.json(questions);
     } catch (error) {
         console.error('Error calling AI worker:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function addContentToPrompt(content, questions) {
+    const prompt = `You are an intelligent agent that creates multiple choice questions based out of the topic of the contents that I give you.
+
+You are given a list of previous questions. Generate a unique question not listed in next to "Do not repeat these questions when generating the new question:". Also generate and 4 possible multiple choice answers that could answer the question. One of the answers should be the only correct answer. Lastly, from the answers you create say the letter of the correct answer. Give the unique generated question not mentioned next to "Do not repeat these questions when generating the new question" as <question>. On the next line list the four possible multiple choice answers from letters A to D respectively. On the last line, give the correct answer letter as 'Correct Option is: <letter>' ending with '@@'. You will also be given a list of previous questions you have written in the past. Do not repeat these questions come up with a unique question to ask the user.
+
+Create 5 questions based off of this prompt
+
+`;
+    return prompt;
+}
 
 function parseQuestion(input) {
     // Split the input into lines
