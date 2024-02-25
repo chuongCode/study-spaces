@@ -17,8 +17,8 @@ const getGroups = async () => {
 
 export default function Home() {
     const router = useRouter();
-    const onJoinGroup = groupId => {
-        router.push(`/group/${groupId}`);
+    const onJoinGroup = () => {
+        router.push(`/group`);
     };
     const { isLoading, data: groups, error } = useQuery(['groups'], getGroups);
 

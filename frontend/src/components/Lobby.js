@@ -7,8 +7,8 @@ const Lobby = () => {
     const [isReady, setIsReady] = useState(false);
 
     return (
-        <div className='w-[1200px] mx-auto'>
-            <div className='flex flex-col items-center h-screen'>
+        <div className='w-[1200px] mx-auto  max-h-screen'>
+            <div className='flex flex-col items-center'>
                 <div className='flex justify-between w-full px-20 py-10'>
                     <div>
                         <h1 style={{ letterSpacing: '0.5rem' }} className='text-4xl font-extralight'>
@@ -29,7 +29,7 @@ const Lobby = () => {
                         )}
                     </div>
                 </div>
-                <div className='flex justify-between w-full gap-2 px-20'>
+                <div className='flex justify-between w-full gap-2'>
                     <PlayerCard />
                     <PlayerCard />
                     <PlayerCard />
