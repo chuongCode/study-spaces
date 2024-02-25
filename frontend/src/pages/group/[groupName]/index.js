@@ -94,7 +94,7 @@ const GroupPage = () => {
     if (!winner && !tiers && gameState === 'end') {
         return (
             <div className='flex flex-col items-center justify-center w-full h-screen'>
-                <Header>Waiting for others to finished!</Header>
+                <Header>Waiting for others to be finished!</Header>
             </div>
         );
     }
