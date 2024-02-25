@@ -25,6 +25,7 @@ const { group } = require('console');
 const GroupQuizQuestion = db.GroupQuizQuestion;
 const GroupQuiz = db.GroupQuiz;
 const Group = db.Group;
+const GroupContent = db.GroupContent;
 
 init.get('/', async function (req, res, next) {
     res.json({
@@ -48,40 +49,39 @@ init.post('/createGroup', async function (req, res, next) {
 
 // create group quiz then create groupquizquestions
 init.get('/createTestQuiz', async function (req, res, next) {
-    
-    const quiz = await GroupQuiz.create({ groupId: 1});
+    const quiz = await GroupQuiz.create({ groupId: 1 });
 
     const quizQuestion1 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Got Milk?',
         answers: ['Yes', 'No', 'Maybe'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion2 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Where is Waldo?',
         answers: ['Idk', 'Here!', 'There?'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion3 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'What is in your wallet?',
         answers: ['CapitalOne', 'MasterCard', 'Visa'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion4 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Where is Kayla going to work?',
         answers: ['Ramp', 'LinkedIn', 'Brex'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
     const quizQuestion5 = await GroupQuizQuestion.create({
         quizId: quiz.id,
         question: 'Do you know the way?',
         answers: ['I kno de wae', 'No', 'What is the way?'],
-        correctAnswerIndex: 0
+        correctAnswerIndex: 0,
     });
-    
+
     res.json(quiz);
     console.log(quiz);
 });
@@ -181,7 +181,8 @@ init.post('/ai-request', async (req, res) => {
         // send the prompt to the AI
         // send the response to the client
         // create a GroupQuiz with the response and groupId (store the response in the database for future use)
-
+        const test =
+            'Team Development 5 team roles * Design Team Lead (DTL) * Ensure organization needs are met and on time * If someone is falling behind/not meeting standards… talk to them * Responsible for quality of client’s engagement * Design team lead is a senior designer - regardless of discipline and has exposures to others * Team lead is sufficiently involved to understand what’s going on * There is no separation of business responsibility and design responsibilities * Understand POV of each discipline * Not fully invested in project * Develops initial research plan - done in consultation with the rest of the team * Works closely with visual and industrial designers on how the visual and physical design communicates system’s behavior * Relative importance of information of the behavior of widgets and physical controls * Reviews design documentation developed by IxD synthesizer';
         const prompt = `You are an intelligent agent that creates multiple choice questions based out of the topic of the contents that I give you.
 
 You should generate one question, and 4 possible multiple choice answers that could answer the question. One of the answers should be the only correct answer. Lastly, from the answers you create say the letter of the correct answer.Give the generated question as <question>. On the next line list the four possible multiple choice answers from letters A to D respectively. On the last line, give the correct answer letter as 'Correct Option is: <letter>' ending with '@@'.
@@ -211,8 +212,10 @@ Correct Answer: A@@
 This time when I give you the content. Generate 5 sets of multiple choice question and answers in the example format above.
 NOTE !!!! [DO NOT GIVE ME ANY INTRO, JUST GIVE ME THE QUESTION AND ANSWERS AS SHOWN IN THE EXAMPLE ABOVE]
 
-Content: ${req.body.content}
+Content: ${test}
 `;
+
+        console.log(req.body.content);
 
         // Read the content of the text file containing the prompt
         const API_TOKEN = process.env.API_KEY;
@@ -224,7 +227,7 @@ Content: ${req.body.content}
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${API_TOKEN}`,
                 },
-                body: JSON.stringify({prompts: [prompt]}),
+                body: JSON.stringify({ prompt }),
             }
         );
         if (!response.ok) {
@@ -234,7 +237,7 @@ Content: ${req.body.content}
         console.log(responseData);
         const groupId = req.body.groupId;
         //make api call to get content
-        const content = await GroupContent.findOne({ where: { groupId: groupId } });
+        //const content = await GroupContent.findOne({ where: { groupId: groupId } });
 
         //Create a GroupQuizQuestion with the response and groupId
 
