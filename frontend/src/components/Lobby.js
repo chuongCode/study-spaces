@@ -2,16 +2,11 @@ import React, { useState } from 'react';
 import { UploadPDF } from '@/components/UploadPDF';
 import PlayerCard from '@/components/PlayerCard';
 import { useRouter } from 'next/router';
-import useStore from '@/zustand/store'; 
-
-//import store
 
 const Lobby = () => {
-    const partyLeader = useStore(state => state.username);
     const numPlayers = 2;
     const [isReady, setIsReady] = useState(false);
-    const { groupname, groupId } = useRouter().query; // Get the groupId from the URL
-    const spaceName = groupname; 
+    const { groupId } = useRouter().query; // Get the groupId from the URL
 
     return (
         <div className='w-[1200px] mx-auto  max-h-screen'>
@@ -19,7 +14,7 @@ const Lobby = () => {
                 <div className='flex justify-between w-full px-20 py-10'>
                     <div>
                         <h1 style={{ letterSpacing: '0.5rem' }} className='text-4xl font-extralight'>
-                            {partyLeader}'s Study Space
+                            Study Space
                         </h1>
                         {numPlayers > 1 ? (
                             <h2 className='text-2xl font-extralight'>{numPlayers}/5 Players</h2>
