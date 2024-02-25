@@ -143,8 +143,10 @@ io.on('connection', function (socket) {
                 const playersWithHighestPoint = playersInGame.filter(player => player.point === highestPoint);
                 if (playersWithHighestPoint.length > 1) {
                     io.sockets.emit('gameTie', playersWithHighestPoint.map(player => player.displayName).join(' '));
+                    playersInGame = [];
                 } else {
                     io.sockets.emit('gameWon', playersWithHighestPoint[0].displayName);
+                    playersInGame = [];
                 }
             } else {
                 console.log('end game 2');
@@ -160,118 +162,10 @@ io.on('connection', function (socket) {
     socket.on('startGame', async groupId => {
         console.log('START GAME!!!');
         io.sockets.emit('loadingGame', 0);
-        const callAIAboutContent = async groupId => {
-            try {
-                // Given group Id, get all the group content
-                // stringify and send to prompt
 
-                const paragraph1 = `Over the past five decades, spanning from 1974 to 2024, the world has undergone significant transformations. The period witnessed the end of the Cold War in the late 1980s, culminating with the dissolution of the Soviet Union in 1991. The 21st century saw the rise of globalization, accelerated by technological advancements, notably the widespread adoption of the internet since the 1990s. Major events such as the September 11 attacks in 2001 and the global financial crisis of 2008 reshaped geopolitics and economics. Technological innovations like the proliferation of smartphones, beginning with the launch of the iPhone in 2007, have revolutionized communication and daily life. Moreover, movements for civil rights and social justice, such as the Arab Spring starting in 2010 and the Black Lives Matter movement, have garnered global attention and sparked societal change. Challenges including climate change, economic inequality, and geopolitical tensions remain pressing issues as the world continues to navigate the complexities of the 21st century.`;
-
-                const content = paragraph1;
-
-                let questions = [];
-
-                const prompt = addContentToPrompt(content);
-                const API_TOKEN = process.env.API_KEY;
-                const response = await fetch(
-                    `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${API_TOKEN}`,
-                        },
-                        body: JSON.stringify({ prompt }),
-                    }
-                );
-                if (!response.ok) {
-                    throw new Error('Failed to fetch AI response');
-                }
-                const responseData = await response.json();
-
-                const contentRes = responseData.result.response;
-                const question = contentRes.split('\n').slice(1);
-
-                const questionsList = [];
-                let count = 0;
-                for (const q of question) {
-                    count++;
-                    io.sockets.emit('loadingGame', count);
-                    const secondPrompt = addQuestionToPrompt(q);
-
-                    const response2 = await fetch(
-                        `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${API_TOKEN}`,
-                            },
-                            body: JSON.stringify({ prompt: secondPrompt }),
-                        }
-                    );
-                    const responseData2 = await response2.json();
-                    const resContentQuestion = responseData2.result.response;
-                    const parsedAnswers = resContentQuestion
-                        .split('\n')
-                        .slice(0)
-                        .filter(
-                            str =>
-                                str.length > 0 &&
-                                str !== "Sure, I'd be happy to help! Here is my answer to your question:"
-                        )
-                        .map(str => {
-                            const description = str.replace(/\//g, '').replace(/"/g, '');
-                            return description;
-                        });
-                    const thirdPrompt = addWrongQuestionToPrompt(q);
-
-                    const response3 = await fetch(
-                        `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${API_TOKEN}`,
-                            },
-                            body: JSON.stringify({ prompt: thirdPrompt }),
-                        }
-                    );
-                    const responseData3 = await response3.json();
-                    const wrongs = responseData3.result.response
-                        .split('\n')
-                        .slice(2)
-                        .filter(
-                            str =>
-                                str.length > 0 &&
-                                str !== "Sure, I'd be happy to help! Here is my answer to your question:"
-                        )
-                        .map(str => {
-                            const parts = str.split(/(?<=^\d+\.\s)/);
-                            const description = parts[1].replace(/\//g, '').replace(/"/g, '');
-                            return description;
-                        });
-                    const correctAnswer = parsedAnswers[0];
-                    const answers = [...parsedAnswers, ...wrongs];
-
-                    function shuffleArray(array) {
-                        for (let i = array.length - 1; i > 0; i--) {
-                            const j = Math.floor(Math.random() * (i + 1)); // Generate random index
-                            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-                        }
-                        return array;
-                    }
-                    const newAnswers = shuffleArray(answers);
-                    const correctAnswerIndex = newAnswers.findIndex(answer => answer === correctAnswer);
-                    questionsList.push({ question: q, answers: newAnswers, correctAnswerIndex });
-                }
-                return questionsList;
-            } catch (error) {
-                console.error('Error calling AI worker:', error);
-                return [];
-            }
-        };
-        const questionList = await callAIAboutContent(groupId);
+        const questionList = await callAIAboutContent(groupId, count => {
+            io.sockets.emit('loadingGame', count);
+        });
 
         const mockQuestion = [
             {
@@ -332,6 +226,116 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', () => console.log(`Connection left (${socket.id})`));
 });
+
+const callAIAboutContent = async (groupId, callback) => {
+    try {
+        // Given group Id, get all the group content
+        // stringify and send to prompt
+
+        const paragraph1 = `Over the past five decades, spanning from 1974 to 2024, the world has undergone significant transformations. The period witnessed the end of the Cold War in the late 1980s, culminating with the dissolution of the Soviet Union in 1991. The 21st century saw the rise of globalization, accelerated by technological advancements, notably the widespread adoption of the internet since the 1990s. Major events such as the September 11 attacks in 2001 and the global financial crisis of 2008 reshaped geopolitics and economics. Technological innovations like the proliferation of smartphones, beginning with the launch of the iPhone in 2007, have revolutionized communication and daily life. Moreover, movements for civil rights and social justice, such as the Arab Spring starting in 2010 and the Black Lives Matter movement, have garnered global attention and sparked societal change. Challenges including climate change, economic inequality, and geopolitical tensions remain pressing issues as the world continues to navigate the complexities of the 21st century.`;
+
+        const content = paragraph1;
+
+        let questions = [];
+
+        const prompt = addContentToPrompt(content);
+        const API_TOKEN = process.env.API_KEY;
+        const response = await fetch(
+            `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${API_TOKEN}`,
+                },
+                body: JSON.stringify({ prompt }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error('Failed to fetch AI response');
+        }
+        const responseData = await response.json();
+
+        const contentRes = responseData.result.response;
+        const question = contentRes.split('\n').slice(1);
+
+        const questionsList = [];
+        let count = 0;
+        for (const q of question) {
+            count++;
+            if (callback) {
+                callback(count);
+            }
+            const secondPrompt = addQuestionToPrompt(q);
+
+            const response2 = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${API_TOKEN}`,
+                    },
+                    body: JSON.stringify({ prompt: secondPrompt }),
+                }
+            );
+            const responseData2 = await response2.json();
+            const resContentQuestion = responseData2.result.response;
+            const parsedAnswers = resContentQuestion
+                .split('\n')
+                .slice(0)
+                .filter(
+                    str => str.length > 0 && str !== "Sure, I'd be happy to help! Here is my answer to your question:"
+                )
+                .map(str => {
+                    const description = str.replace(/\//g, '').replace(/"/g, '');
+                    return description;
+                });
+            const thirdPrompt = addWrongQuestionToPrompt(q);
+
+            const response3 = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${API_TOKEN}`,
+                    },
+                    body: JSON.stringify({ prompt: thirdPrompt }),
+                }
+            );
+            const responseData3 = await response3.json();
+            const wrongs = responseData3.result.response
+                .split('\n')
+                .slice(2)
+                .filter(
+                    str => str.length > 0 && str !== "Sure, I'd be happy to help! Here is my answer to your question:"
+                )
+                .map(str => {
+                    const parts = str.split(/(?<=^\d+\.\s)/);
+                    const description = parts[1].replace(/\//g, '').replace(/"/g, '');
+                    return description;
+                });
+            const correctAnswer = parsedAnswers[0];
+            const answers = [...parsedAnswers, ...wrongs];
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1)); // Generate random index
+                    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+                }
+                return array;
+            }
+            const newAnswers = shuffleArray(answers);
+            const correctAnswerIndex = newAnswers.findIndex(answer => answer === correctAnswer);
+            questionsList.push({ question: q, answers: newAnswers, correctAnswerIndex });
+        }
+        return questionsList;
+    } catch (error) {
+        console.error('Error calling AI worker:', error);
+        return [];
+    }
+};
 
 function addContentToPrompt(content) {
     const prompt = `You are an intelligent agent that creates questions based out of the topic of the contents that I give you. The questions should be able to be answers with one word.
