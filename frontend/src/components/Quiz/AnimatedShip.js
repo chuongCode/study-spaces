@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { SpaceShip1 } from '../SpaceShip1';
 import { useAnimate } from 'framer-motion';
 
-export const AnimatedShip = ({ currentPlayerQuestionIndex, currentPlayerNumber }) => {
+export const AnimatedShip = ({ currentPlayerQuestionIndex, currentPlayerNumber, player }) => {
     const [scope, animate] = useAnimate();
 
     useEffect(() => {
@@ -13,10 +13,10 @@ export const AnimatedShip = ({ currentPlayerQuestionIndex, currentPlayerNumber }
     }, [currentPlayerQuestionIndex]);
     return (
         <div
-            className={`flex gap-10 justify-center absolute left-0`}
+            className={`flex flex-col gap-10 justify-center absolute left-0`}
             style={{ top: `${currentPlayerNumber * 55}px` }}
             ref={scope}>
-            <SpaceShip1 size={50} className='rotate-[140deg] ' />
+            <SpaceShip1 size={100} className='rotate-[140deg]' name={player.name} />
         </div>
     );
 };
