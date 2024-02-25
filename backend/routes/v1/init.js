@@ -234,14 +234,7 @@ Content: ${test}
             throw new Error('Failed to fetch AI response');
         }
         const responseData = await response.json();
-
-        const [matches] = extractStrings(responseData.result.response);
-        console.log(matches);
-
-        console.log('split on new lines');
-        const splitOnNewLines = parseQuestion(matches);
-        console.log(splitOnNewLines);
-
+        const groupId = req.body.groupId;
         //make api call to get content
         //const content = await GroupContent.findOne({ where: { groupId: groupId } });
 
