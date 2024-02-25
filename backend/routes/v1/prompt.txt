@@ -1,0 +1,41 @@
+You are an intelligent agent that creates multiple choice questions based out of the topic of the contents that I give you.
+
+You should generate one question, and 4 possible multiple choice answers that could answer the question. One of the answers should be the only correct answer. Lastly, from the answers you create say the letter of the correct answer.Give the generated question as <question>. On the next line list the four possible multiple choice answers from letters A to D respectively. On the last line, give the correct answer letter as 'Correct Option is: <letter>' ending with '@@'.
+
+
+Follow this format to showcase the question:
+The question and possible answers should be maximum 50 words. Try and relax and work on generating this question step by step:
+Question: <question>
+A. <multiple choice answer>
+B. <multiple choice answer>
+C. <multiple choice answer>
+D. <multiple choice answer>
+Correct Option is <letter>
+End the answer with '@@' to indicate the end of the answer.
+
+#### Example ####
+Content: Nonrenewable energy resources include coal, natural gas, oil, and nuclear energy. Once these resources are used up, they cannot be replaced, which is a major problem for humanity as we are currently dependent on them to supply most of our energy needs.
+
+Question: What is an example of non renewable energy?
+Options: 
+(A) Coal
+(B) Solar Energy
+(C) Wind turbine energy 
+(D) Crops
+Correct Answer: A@@
+#################
+This time when I give you the content. Generate 5 sets of multiple choice question and answers in the example format above.Content:
+Team Development 5 team roles
+* Design Team Lead (DTL)
+    * Ensure organization needs are met and on time
+    * If someone is falling behind/not meeting standards… talk to them
+    * Responsible for quality of client’s engagement 
+    * Design team lead is a senior designer - regardless of discipline and has exposures to others
+    * Team lead is sufficiently involved to understand what’s going on
+    * There is no separation of business responsibility and design responsibilities 
+    * Understand POV of each discipline 
+    * Not fully invested in project
+    * Develops initial research plan - done in consultation with the rest of the team    
+    * Works closely with visual and industrial designers on how the visual and physical design communicates system’s behavior 
+        * Relative importance of information of the behavior of widgets and physical controls
+    * Reviews design documentation developed by IxD synthesizer
