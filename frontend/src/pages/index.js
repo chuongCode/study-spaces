@@ -7,6 +7,7 @@ import { api } from '@/lib/axios';
 import { Inter } from 'next/font/google';
 import { useRouter } from 'next/navigation';
 import { useQuery } from 'react-query';
+import { useState, useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,10 +18,20 @@ const getGroups = async () => {
 
 export default function Home() {
     const router = useRouter();
-    const onJoinGroup = () => {
-        router.push(`/group`);
+    const onJoinGroup = id => {
+        router.push(`/group/${id}`);
     };
     const { isLoading, data: groups, error } = useQuery(['groups'], getGroups);
+    const [spaceName, setSpaceName] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleCreateGroup = async event => {
+        event.preventDefault();
+        if (spaceName) {
+            await api.post('/createGroup', { name: spaceName });
+            router.push(`/group/${spaceName}`);
+            setIsModalOpen(false);
+        }
+    };
 
     return (
         <div className={`${inter.className} w-full h-screen flex flex-col justify-center items-center`}>
@@ -51,6 +62,25 @@ export default function Home() {
                         ))}
                     </ul>
                 </div>
+            </div>
+            <div>
+                <Button onClick={() => setIsModalOpen(!isModalOpen)}>Create Your Space</Button>
+            </div>
+
+            <div
+                className='absolute flex-col items-center justify-center h-screen bg-slate-500 w-full'
+                style={{ display: isModalOpen ? 'flex' : 'none' }}>
+                <form className='flex flex-col gap-4 min-w-2.5 ' onClick={handleCreateGroup}>
+                    <input
+                        type='text'
+                        placeholder='Space Name'
+                        className='rounded-lg px-4 py-2 border-b border-b-slate-50 bg-transparent text-black placeholder-white'
+                        value={spaceName}
+                        onChange={e => setSpaceName(e.target.value)}
+                    />
+                    <Button type='submit'>Confirm</Button>
+                    <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                </form>
             </div>
         </div>
     );
