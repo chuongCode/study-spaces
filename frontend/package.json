@@ -17,7 +17,8 @@
         "react-drag-drop-files": "^2.3.10",
         "react-query": "^3.39.3",
         "react-starfield": "^1.0.3",
-        "socket.io-client": "^4.7.4"
+        "socket.io-client": "^4.7.4",
+        "zustand": "^4.5.1"
     },
     "devDependencies": {
         "autoprefixer": "^10.0.1",
