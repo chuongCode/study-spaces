@@ -1,32 +1,35 @@
-import { useEffect } from 'react';  
+import { useEffect } from 'react';
 import { useState } from 'react';
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client';
 
-let socket;
+const socket = io('http://localhost:3005', {
+    autoConnect: false,
+});
 
 const JoinRoomButton = ({ room }) => {
-    const [socket, setSocket] = useState(null);
-  useEffect(() => {
-    const socket = io("http://localhost:3005"); // replace with your server URL
-    setSocket(socket);
-    return () => {
-      socket.disconnect();
+    const connectSocket = () => {
+        socket.connect();
     };
-  }, []);
 
-  const joinRoom = () => {
-    if (socket) {
-        console.log('click')
-        socket.emit('join-room', room);
-    }
-    
-  };
+    const joinRoom = () => {
+        if (socket.connected) {
+            console.log('socket connected call');
+        } else {
+            console.log('socket not connected');
+        }
+        if (socket) {
+            console.log('click');
+            socket.emit('join-room', room);
+        }
+    };
 
-  return (
-    <button onClick={joinRoom}>
-      Join Room
-    </button>
-  );
+    return (
+        <>
+            <button onClick={connectSocket}>connect socket</button>
+
+            <button onClick={joinRoom}>Join Room</button>
+        </>
+    );
 };
 
 export default JoinRoomButton;

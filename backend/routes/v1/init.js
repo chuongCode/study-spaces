@@ -19,6 +19,12 @@ const PDFParser = require('pdf-parse');
 const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 dotenv.config();
+const Sequelize = require('sequelize');
+const db = require('../../models');
+const { group } = require('console');
+const GroupQuizQuestion = db.GroupQuizQuestion;
+const GroupQuiz = db.GroupQuiz;
+const Group = db.Group;
 
 init.get('/', async function (req, res, next) {
     res.json({
@@ -27,11 +33,57 @@ init.get('/', async function (req, res, next) {
     });
 });
 
-init.get('/test', async function (req, res, next) {
-    res.json({
-        version: 1.0,
-        name: 'Express.js & Socket.io API boilerplate',
+init.get('/getGroups', async function (req, res, next) {
+    const groups = await Group.findAll();
+    res.json(groups);
+    console.log(groups);
+});
+
+init.post('/createGroup', async function (req, res, next) {
+    const { name } = req.body;
+    const group = await Group.create({ name, status: 'inactive' });
+    res.json(group);
+    console.log(group);
+});
+
+// create group quiz then create groupquizquestions
+init.get('/createTestQuiz', async function (req, res, next) {
+    
+    const quiz = await GroupQuiz.create({ groupId: 1});
+
+    const quizQuestion1 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Got Milk?',
+        answers: ['Yes', 'No', 'Maybe'],
+        correctAnswerIndex: 0
     });
+    const quizQuestion2 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Where is Waldo?',
+        answers: ['Idk', 'Here!', 'There?'],
+        correctAnswerIndex: 0
+    });
+    const quizQuestion3 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'What is in your wallet?',
+        answers: ['CapitalOne', 'MasterCard', 'Visa'],
+        correctAnswerIndex: 0
+    });
+    const quizQuestion4 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Where is Kayla going to work?',
+        answers: ['Ramp', 'LinkedIn', 'Brex'],
+        correctAnswerIndex: 0
+    });
+    const quizQuestion5 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Do you know the way?',
+        answers: ['I kno de wae', 'No', 'What is the way?'],
+        correctAnswerIndex: 0
+    });
+    
+    res.json(quiz);
+    console.log(quiz);
 });
 
 init.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
@@ -120,74 +172,4 @@ async function convertToPDF(filePath) {
             });
     });
 }
-
-init.post('/ai-request', async (req, res) => {
-    try {
-        // get groupId from req
-        // get content from GroupContent where groupId = groupId
-        // create a promt from the content : "The content of the group is: " + content
-        // send the prompt to the AI
-        // send the response to the client
-        // create a GroupQuiz with the response and groupId (store the response in the database for future use)
-
-        const prompt = `You are an intelligent agent that creates multiple choice questions based out of the topic of the contents that I give you.
-
-You should generate one question, and 4 possible multiple choice answers that could answer the question. One of the answers should be the only correct answer. Lastly, from the answers you create say the letter of the correct answer.Give the generated question as <question>. On the next line list the four possible multiple choice answers from letters A to D respectively. On the last line, give the correct answer letter as 'Correct Option is: <letter>' ending with '@@'.
-
-
-Follow this format to showcase the question:
-The question and possible answers should be maximum 50 words. Try and relax and work on generating this question step by step:
-Question: <question>
-A. <multiple choice answer>
-B. <multiple choice answer>
-C. <multiple choice answer>
-D. <multiple choice answer>
-Correct Option is <letter>
-End the answer with '@@' to indicate the end of the answer.
-
-#### Example ####
-Content: Nonrenewable energy resources include coal, natural gas, oil, and nuclear energy. Once these resources are used up, they cannot be replaced, which is a major problem for humanity as we are currently dependent on them to supply most of our energy needs.
-
-Question: What is an example of non renewable energy?
-Options: 
-(A) Coal
-(B) Solar Energy
-(C) Wind turbine energy 
-(D) Crops
-Correct Answer: A@@
-#################
-This time when I give you the content. Generate 5 sets of multiple choice question and answers in the example format above.
-
-Content: ${promptFileContent}
-`;
-
-        // Read the content of the text file containing the prompt
-        const API_TOKEN = process.env.API_KEY;
-        const response = await fetch(
-            `https://api.cloudflare.com/client/v4/accounts/${process.env.AccountID}/ai/run/@cf/meta/llama-2-7b-chat-int8`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${API_TOKEN}`,
-                },
-                body: JSON.stringify({ prompts: prompt }),
-            }
-        );
-        if (!response.ok) {
-            throw new Error('Failed to fetch AI response');
-        }
-        const responseData = await response.json();
-        const groupId = req.body.groupId;
-        const content = await GroupContent.findOne({ where: { groupId: groupId } });
-
-        //Create a GroupQuizQuestion with the response and groupId
-
-        res.json(responseData);
-    } catch (error) {
-        console.error('Error calling AI worker:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
-
 module.exports = init;

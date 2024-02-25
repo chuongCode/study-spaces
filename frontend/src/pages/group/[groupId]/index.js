@@ -1,7 +1,12 @@
+import { Quiz } from '@/components/Quiz/Quiz';
 import React from 'react';
 
 const GroupPage = () => {
-    return <div>group</div>;
+    return (
+        <div>
+            <Quiz />
+        </div>
+    );
 };
 
 export default GroupPage;
