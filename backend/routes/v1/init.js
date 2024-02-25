@@ -19,6 +19,8 @@ const PDFParser = require('pdf-parse');
 const Sequelize = require('sequelize');
 const db = require('../../models');
 const { group } = require('console');
+const GroupQuizQuestion = db.GroupQuizQuestion;
+const GroupQuiz = db.GroupQuiz;
 const Group = db.Group;
 
 init.get('/', async function (req, res, next) {
@@ -39,6 +41,46 @@ init.post('/createGroup', async function (req, res, next) {
     const group = await Group.create({ name, status: 'inactive' });
     res.json(group);
     console.log(group);
+});
+
+// create group quiz then create groupquizquestions
+init.get('/createTestQuiz', async function (req, res, next) {
+    
+    const quiz = await GroupQuiz.create({ groupId: 1});
+
+    const quizQuestion1 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Got Milk?',
+        answers: ['Yes', 'No', 'Maybe'],
+        correctAnswerIndex: 0
+    });
+    const quizQuestion2 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Where is Waldo?',
+        answers: ['Idk', 'Here!', 'There?'],
+        correctAnswerIndex: 0
+    });
+    const quizQuestion3 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'What is in your wallet?',
+        answers: ['CapitalOne', 'MasterCard', 'Visa'],
+        correctAnswerIndex: 0
+    });
+    const quizQuestion4 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Where is Kayla going to work?',
+        answers: ['Ramp', 'LinkedIn', 'Brex'],
+        correctAnswerIndex: 0
+    });
+    const quizQuestion5 = await GroupQuizQuestion.create({
+        quizId: quiz.id,
+        question: 'Do you know the way?',
+        answers: ['I kno de wae', 'No', 'What is the way?'],
+        correctAnswerIndex: 0
+    });
+    
+    res.json(quiz);
+    console.log(quiz);
 });
 
 init.post('/upload-pdf', upload.single('pdf'), async (req, res) => {

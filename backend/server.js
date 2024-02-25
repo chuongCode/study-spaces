@@ -88,9 +88,14 @@ io.on('connection', function (socket) {
         socket.emit('test');
     });
 
-    socket.on('startGame', async () => {
+    const quizId = '1';
+    
+    socket.on('startGame', async (groupId) => {
 
         // await startGameInDatabase();
+        // /find the group by ID
+        // /set group active
+        
 
         // await setGameToActive();
 
