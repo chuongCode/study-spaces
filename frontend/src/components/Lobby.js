@@ -7,19 +7,17 @@ import useStore from '@/zustand/store';
 //import store
 
 const Lobby = () => {
-    const partyLeader = useStore(state => state.username);
     const numPlayers = 2;
     const [isReady, setIsReady] = useState(false);
-    const { groupname, groupId } = useRouter().query; // Get the groupId from the URL
-    const spaceName = groupname;
+    const { groupId } = useRouter().query; // Get the groupId from the URL
 
     return (
         <div className=' mx-auto max-w-[1000px] max-h-screen'>
             <div className='flex flex-col gap-5 items-center'>
                 <div className='flex justify-between h-full w-full py-10 '>
                     <div>
-                        <h1 style={{ letterSpacing: '0.5rem' }} className='text-2xl font-extralight pb-10'>
-                            {partyLeader}'s Study Space
+                        <h1 style={{ letterSpacing: '0.5rem' }} className='text-4xl font-extralight'>
+                            Study Space
                         </h1>
                         {numPlayers > 1 ? (
                             <h2 className='text-xl font-extralight'>{numPlayers}/5 Players</h2>

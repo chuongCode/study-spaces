@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-const useStore = create(set => ({
+export const useUserName = create(set => ({
     username: null,
     spaceName: null,
     //function to set the username
@@ -9,5 +9,3 @@ const useStore = create(set => ({
     setSpaceName: spaceName => set({ spaceName }),
     removeSpaceName: () => set({ spaceName: null }),
 }));
-
-export default useStore;
