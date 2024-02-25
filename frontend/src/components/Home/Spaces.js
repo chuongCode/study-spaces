@@ -63,11 +63,9 @@ export function Spaces() {
                         }}>
                         <SpaceShip1 size={300} />
                     </motion.div>
-                    {/* <SpaceShip2 size={250} className='absolute bottom-24' />
-                    <SpaceShip3 size={150} className='absolute bottom-48 right-10' /> */}
                 </motion.div>
                 <motion.div
-                    className='relative w-96'
+                    className='relative w-96 overflow-clip'
                     transition={{ duration: 1, delay: 0.5, ease: 'easeIn' }}
                     animate={{
                         opacity: [0, 100],

@@ -18,6 +18,7 @@ export const AnimatedShip = ({ name, score, currentPlayerQuestionIndex, currentP
             ref={scope}>
             <div className='relative'>
                 <SpaceShip1 size={100} className='rotate-[140deg]' />
+                <Image src={'/fire.png'} width={100} height={100 * 1.4} />
                 <h3 className='absolute right-4 bottom-2 font-extralight text-sm'>
                     {name} <span className='bg-blue-500 p-1 text-xs bg-opacity-25 rounded-md'>{score}</span>
                 </h3>

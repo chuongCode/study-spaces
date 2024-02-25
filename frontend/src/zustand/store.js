@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export const useUserName = create(set => ({
     username: null,
     spaceName: null,
+
     //function to set the username
     setUsername: username => set({ username }),
     removeUsername: () => set({ username: null }),
