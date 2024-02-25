@@ -73,12 +73,14 @@ export function Spaces() {
                         opacity: [0, 100],
                         y: [10, 0],
                     }}>
-                    <Header className='w-full text-center'>Study Spaces</Header>
-
-                    <ul className='flex flex-col gap-4 overflow-auto'>
-                        <p className='font-extralight uppercase text-sm w-full text-center pb-4'>
+                    <div>
+                        <Header className='w-full text-center'>Study Spaces</Header>
+                        <p className='font-extralight uppercase text-xs w-full text-center relative top-[-30px]'>
                             Welcome back {username}
                         </p>
+                    </div>
+
+                    <ul className='flex flex-col gap-4 overflow-auto'>
                         <div className='flex flex-col gap-4 max-h-[500px]overflow-auto'>
                             {groups?.map((group, idx) => (
                                 <motion.li
