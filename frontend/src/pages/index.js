@@ -1,6 +1,8 @@
+import { Button } from '@/components/Button';
 import { SpaceShip1 } from '@/components/SpaceShip1';
 import { SpaceShip2 } from '@/components/SpaceShip2';
 import { SpaceShip3 } from '@/components/SpaceShip3';
+import { Header } from '@/components/header';
 import { api } from '@/lib/axios';
 import { Inter } from 'next/font/google';
 import { useRouter } from 'next/navigation';
@@ -29,11 +31,7 @@ export default function Home() {
                     <SpaceShip3 size={150} className='absolute bottom-48 right-10' />
                 </div>
                 <div>
-                    <h1
-                        className='uppercase tracking-widest text-3xl font-extralight pb-8'
-                        style={{ letterSpacing: '0.5rem' }}>
-                        Study Spaces
-                    </h1>
+                    <Header>Study Spaces</Header>
                     <ul className='flex flex-col gap-4 h-[500px]  overflow-auto'>
                         {groups?.map(group => (
                             <li
@@ -42,13 +40,12 @@ export default function Home() {
                                 <h3>{group.name}</h3>
                                 <div className='flex gap-4 items-center'>
                                     <div>{group.playerCount} / 5</div>
-                                    <button
+                                    <Button
                                         onClick={() => {
                                             onJoinGroup(group.id);
-                                        }}
-                                        className='px-4 py-2 border border-white rounded-lg hover:bg-white hover:bg-opacity-20 transition duration-500 hover:scale-95'>
+                                        }}>
                                         {group.status === 'inactive' ? 'Join' : 'Full'}
-                                    </button>
+                                    </Button>
                                 </div>
                             </li>
                         ))}

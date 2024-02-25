@@ -50,10 +50,30 @@ export const Quiz = () => {
     const currentPlayerId = 1;
     const currentPlayer = playersState.find(player => player.id === currentPlayerId);
 
+    const moveCurrentPlayer = () => {
+        setPlayersState(prev => {
+            return prev.map(player => {
+                if (player.id === currentPlayer.id) {
+                    return {
+                        ...player,
+                        currentQuestionIndex: player.currentQuestionIndex + 1,
+                    };
+                }
+                return player;
+            });
+        });
+    };
+
     return (
-        <div>
-            <Game playersState={playersStateSorted} quizLength={QUIZ_QUESTION.length} />
-            <QuizQuestions quiz={QUIZ_QUESTION} currentPlayer={currentPlayer} />
+        <div className='flex w-full h-screen justify-center items-center'>
+            <div>
+                <div className='flex w-full justify-end max-w-3xl uppercase font-extralight'>
+                    {currentPlayer.currentQuestionIndex + 1} / {QUIZ_QUESTION.length} questions
+                </div>
+                <Game playersState={playersStateSorted} quizLength={QUIZ_QUESTION.length} />
+                <QuizQuestions quiz={QUIZ_QUESTION} currentPlayer={currentPlayer} />
+                <button onClick={moveCurrentPlayer}>test</button>
+            </div>
         </div>
     );
 };
