@@ -210,7 +210,7 @@ Correct Answer: A@@
 #################
 This time when I give you the content. Generate 5 sets of multiple choice question and answers in the example format above.
 
-Content: ${promptFileContent}
+Content: ${req.body.content}
 `;
 
         // Read the content of the text file containing the prompt
