@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { UploadPDF } from '@/components/UploadPDF';
 import PlayerCard from '@/components/PlayerCard';
+import { useRouter } from 'next/router';
 
 const Lobby = () => {
     const partyLeader = 'John Smith';
     const numPlayers = 2;
     const [isReady, setIsReady] = useState(false);
+    const { groupId } = useRouter().query; // Get the groupId from the URL
 
     return (
         <div className='w-[1200px] mx-auto  max-h-screen'>
@@ -21,7 +24,8 @@ const Lobby = () => {
                         )}
                     </div>
                     <div className='flex items-center gap-5'>
-                        <button className='p-5 text-xl border-2 rounded'>UPLOAD PDF</button>
+                        {/* <button className='p-5 text-xl border-2 rounded'>UPLOAD PDF</button> */}
+                        <UploadPDF groupId={groupId} />
                         {isReady ? (
                             <p className='text-xl text-green-500'>PDF(s) READY?</p>
                         ) : (
