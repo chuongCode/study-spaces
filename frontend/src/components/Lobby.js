@@ -4,6 +4,7 @@ import PlayerCard from '@/components/PlayerCard';
 import { useRouter } from 'next/router';
 import { useSocket } from '@/zustand/socket';
 import { Button } from './Button';
+import { Header } from './Header';
 
 //import store
 
@@ -25,9 +26,7 @@ const Lobby = ({ startGame }) => {
             <div className='flex flex-col gap-5 items-center'>
                 <div className='flex justify-between h-full w-full py-10 '>
                     <div>
-                        <h1 style={{ letterSpacing: '0.5rem' }} className='text-4xl font-extraligh uppercase'>
-                            Study Space
-                        </h1>
+                        <Header>Study Space</Header>
                     </div>
                     <div className='flex items-center gap-2'>
                         <UploadPDF groupId={groupId} />
