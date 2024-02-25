@@ -25,7 +25,7 @@ export default function Home() {
     return (
         <div className={`${inter.className} w-full h-screen flex flex-col justify-center items-center`}>
             <div className='flex gap-10'>
-                <div className='w-96 relative'>
+                <div className='relative w-96'>
                     <SpaceShip1 size={150} className='absolute top-6' />
                     <SpaceShip2 size={250} className='absolute bottom-24' />
                     <SpaceShip3 size={150} className='absolute bottom-48 right-10' />
@@ -36,9 +36,9 @@ export default function Home() {
                         {groups?.map(group => (
                             <li
                                 key={group.id}
-                                className='font-extralight uppercase w-88 flex justify-between items-center border-b border-white pb-4'>
+                                className='flex items-center justify-between pb-4 uppercase border-b border-white font-extralight w-88'>
                                 <h3>{group.name}</h3>
-                                <div className='flex gap-4 items-center'>
+                                <div className='flex items-center gap-4'>
                                     <div>{group.playerCount} / 5</div>
                                     <Button
                                         onClick={() => {
