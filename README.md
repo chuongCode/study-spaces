@@ -10,7 +10,7 @@ cd frontend
 npm install
 ```
 
-# Runnning
+# Running
 
 ```
 cd backend
